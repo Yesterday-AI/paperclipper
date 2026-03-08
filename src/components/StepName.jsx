@@ -26,7 +26,8 @@ export default function StepName({ onComplete }) {
   return (
     <Box flexDirection="column">
       <Box>
-        <Text bold>Company name: </Text>
+        <Text color="cyan" bold>? </Text>
+        <Text bold>Company name </Text>
         <TextInput
           value={value}
           onChange={(v) => {
@@ -36,6 +37,7 @@ export default function StepName({ onComplete }) {
           onSubmit={handleSubmit}
         />
       </Box>
+      <Text dimColor>  Your AI company's name. Special characters are allowed.</Text>
       {error ? (
         <Text color="red">  {error}</Text>
       ) : null}

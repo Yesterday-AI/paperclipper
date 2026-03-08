@@ -146,6 +146,19 @@ export default function App({
     ? `${outputDir}/${toPascalCase(companyName)}`
     : "";
 
+  // Map steps to user-visible step numbers (wizard steps only)
+  const STEP_NUMBERS = {
+    [STEPS.NAME]: 1,
+    [STEPS.GOAL]: 2,
+    [STEPS.PROJECT]: 3,
+    [STEPS.PRESET]: 4,
+    [STEPS.MODULES]: 5,
+    [STEPS.ROLES]: 6,
+    [STEPS.SUMMARY]: 7,
+  };
+  const TOTAL_STEPS = 7;
+  const currentStepNum = STEP_NUMBERS[step] || null;
+
   const handleError = (msg) => {
     setError(msg);
     setStep(STEPS.ERROR);
@@ -186,7 +199,7 @@ export default function App({
 
   return (
     <Box flexDirection="column">
-      <Header />
+      <Header step={currentStepNum} totalSteps={TOTAL_STEPS} />
 
       {step === STEPS.LOADING && <Text dimColor>Loading templates...</Text>}
 

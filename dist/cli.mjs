@@ -38453,17 +38453,19 @@ var import_react46 = __toESM(require_react(), 1);
 // src/components/Header.jsx
 var import_react29 = __toESM(require_react(), 1);
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-function Header() {
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-    Box_default,
-    {
-      borderStyle: "round",
-      borderColor: "magenta",
-      paddingX: 2,
-      marginBottom: 1,
-      children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Text, { bold: true, children: "Clipper" })
-    }
-  );
+function Header({ step, totalSteps }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Box_default, { flexDirection: "column", marginBottom: 1, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Box_default, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Text, { bold: true, color: "magenta", children: "Clipper" }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Text, { dimColor: true, children: " \u2014 Bootstrap a Paperclip company" })
+    ] }),
+    step && totalSteps ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Text, { dimColor: true, children: [
+      "Step ",
+      step,
+      "/",
+      totalSteps
+    ] }) : null
+  ] });
 }
 
 // src/components/PrevSelections.jsx
@@ -38471,16 +38473,19 @@ var import_react30 = __toESM(require_react(), 1);
 var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
 function truncate(str, max = 60) {
   if (!str) return "";
-  return str.length > max ? str.slice(0, max) + "\u2026" : str;
+  return str.length > max ? str.slice(0, max) + "..." : str;
 }
 function PrevSelections({ entries }) {
   const filled = entries.filter(([, v]) => v);
   if (filled.length === 0) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Box_default, { flexDirection: "column", marginBottom: 1, children: filled.map(([label, value]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Text, { dimColor: true, children: [
-    label,
-    ": ",
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Box_default, { flexDirection: "column", marginBottom: 1, children: filled.map(([label, value]) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { dimColor: true, children: label ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { dimColor: true, children: label }),
+    " ",
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { color: "cyan", dimColor: true, children: truncate(value) })
+  ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(Text, { dimColor: true, children: [
+    "  ",
     truncate(value)
-  ] }, label)) });
+  ] }) }, label || value)) });
 }
 
 // src/components/StepName.jsx
@@ -38599,7 +38604,8 @@ function StepName({ onComplete }) {
   };
   return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(Box_default, { flexDirection: "column", children: [
     /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(Box_default, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Text, { bold: true, children: "Company name: " }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Text, { color: "cyan", bold: true, children: "? " }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Text, { bold: true, children: "Company name " }),
       /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         build_default,
         {
@@ -38612,6 +38618,7 @@ function StepName({ onComplete }) {
         }
       )
     ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(Text, { dimColor: true, children: "  Your AI company's name. Special characters are allowed." }),
     error ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(Text, { color: "red", children: [
       "  ",
       error
@@ -38643,7 +38650,8 @@ function StepGoal({ onComplete }) {
   return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Box_default, { flexDirection: "column", children: [
     phase === "title" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Box_default, { flexDirection: "column", children: [
       /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Box_default, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { bold: true, children: "Company goal: " }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { color: "cyan", bold: true, children: "? " }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { bold: true, children: "Company goal " }),
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
           build_default,
           {
@@ -38659,11 +38667,12 @@ function StepGoal({ onComplete }) {
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { dimColor: true, children: "  What should this company achieve?" })
     ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Box_default, { flexDirection: "column", children: [
       /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Text, { dimColor: true, children: [
-        "Goal: ",
+        "  Goal: ",
         title
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Box_default, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { bold: true, children: "Description: " }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { color: "cyan", bold: true, children: "? " }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { bold: true, children: "Description " }),
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
           build_default,
           {
@@ -38673,7 +38682,7 @@ function StepGoal({ onComplete }) {
           }
         )
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { dimColor: true, children: "  Optional. Press enter to skip." })
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { dimColor: true, children: "  Optional details. Press enter to skip." })
     ] }),
     error ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Text, { color: "red", children: [
       "  ",
@@ -38709,7 +38718,8 @@ function StepProject({ defaultName, companyDir, onComplete }) {
   const projectPath = companyDir ? `${companyDir}/projects/${name || defaultName}` : null;
   return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Box_default, { flexDirection: "column", children: phase === "name" ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Box_default, { flexDirection: "column", children: [
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Box_default, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { bold: true, children: "Project name: " }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { color: "cyan", bold: true, children: "? " }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { bold: true, children: "Project name " }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
         build_default,
         {
@@ -38720,21 +38730,18 @@ function StepProject({ defaultName, companyDir, onComplete }) {
       )
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Text, { dimColor: true, children: [
-      "  Default: ",
+      '  Press enter for "',
       defaultName,
-      ". Press enter to accept."
-    ] }),
-    projectPath ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Text, { dimColor: true, children: [
-      "  Workspace: ",
-      projectPath
-    ] }) : null
+      '"'
+    ] })
   ] }) : phase === "description" ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Box_default, { flexDirection: "column", children: [
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Text, { dimColor: true, children: [
-      "Project: ",
+      "  Project: ",
       name
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Box_default, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { bold: true, children: "Project description: " }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { color: "cyan", bold: true, children: "? " }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { bold: true, children: "Project description " }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
         build_default,
         {
@@ -38747,7 +38754,7 @@ function StepProject({ defaultName, companyDir, onComplete }) {
     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { dimColor: true, children: "  Optional. Press enter to skip." })
   ] }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Box_default, { flexDirection: "column", children: [
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Text, { dimColor: true, children: [
-      "Project: ",
+      "  Project: ",
       name
     ] }),
     description ? /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Text, { dimColor: true, children: [
@@ -38755,7 +38762,8 @@ function StepProject({ defaultName, companyDir, onComplete }) {
       description
     ] }) : null,
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(Box_default, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { bold: true, children: "GitHub repo URL: " }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { color: "cyan", bold: true, children: "? " }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { bold: true, children: "GitHub repo URL " }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
         build_default,
         {
@@ -39189,30 +39197,38 @@ function StepPreset({ presets, onComplete }) {
   const items = [
     ...presets.map((p) => ({
       key: p.name,
-      label: `${p.name} \u2014 ${p.description || ""}`,
+      label: `${p.name}`,
       value: p
     })),
     {
       key: "custom",
-      label: "custom \u2014 Pick modules manually",
+      label: "custom",
       value: { name: "custom" }
     }
   ];
   return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(Box_default, { flexDirection: "column", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text, { bold: true, children: "Select a preset:" }),
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Box_default, { marginTop: 1, children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(Box_default, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text, { color: "cyan", bold: true, children: "? " }),
+      /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text, { bold: true, children: "Select a preset" })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Box_default, { marginLeft: 2, marginTop: 1, flexDirection: "column", children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       SelectInput_default,
       {
         items,
-        onSelect: (item) => onComplete(item.value)
+        onSelect: (item) => onComplete(item.value),
+        itemComponent: PresetItem
       }
-    ) }),
-    presets.filter((p) => p.constraints?.length).map((p) => /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(Text, { color: "yellow", children: [
-      "  ",
-      p.name,
-      ": ",
-      p.constraints[0]
-    ] }, `constraint-${p.name}`))
+    ) })
+  ] });
+}
+function PresetItem({ isSelected, label, value }) {
+  const desc = value?.description || (label === "custom" ? "Pick modules manually" : "");
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(Box_default, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(Text, { color: isSelected ? "cyan" : void 0, bold: isSelected, children: label }),
+    desc ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(Text, { dimColor: true, children: [
+      " \u2014 ",
+      desc
+    ] }) : null
   ] });
 }
 
@@ -39282,37 +39298,41 @@ function MultiSelect({
     }
   });
   return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Box_default, { flexDirection: "column", children: [
-    label ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { bold: true, children: label }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { dimColor: true, children: "  \u2191\u2193 navigate \xB7 space toggle \xB7 enter confirm" }),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Box_default, { marginTop: 1, flexDirection: "column", children: items.map((item, i) => {
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Box_default, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { color: "cyan", bold: true, children: "? " }),
+      label ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { bold: true, children: label }) : null
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { dimColor: true, children: "  space toggle  enter confirm" }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Box_default, { marginTop: 1, marginLeft: 2, flexDirection: "column", children: items.map((item, i) => {
       const isSelected = selected.has(item.value);
       const isPreselected = preselected.includes(item.value);
       const isCursor = i === cursor;
       const marker = isSelected ? "\u25C9" : "\u25CB";
-      const prefix = isCursor ? "\u276F" : " ";
       return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Box_default, { flexDirection: "column", children: [
         /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Box_default, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Text, { color: isCursor ? "cyan" : void 0, children: [
-            prefix,
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Text, { color: isCursor ? "cyan" : isSelected ? "green" : "gray", children: [
+            isCursor ? ">" : " ",
             " ",
-            marker,
+            marker
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Text, { color: isCursor ? "cyan" : void 0, bold: isCursor, children: [
             " ",
             item.label
           ] }),
-          isPreselected ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { color: "green", children: " [included]" }) : null
+          isPreselected ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Text, { color: "green", dimColor: true, children: " preset" }) : null
         ] }),
-        item.description ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Text, { dimColor: true, children: [
+        isCursor && item.description ? /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Text, { dimColor: true, children: [
           "      ",
           item.description
         ] }) : null,
-        item.hints?.map((h, j) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Text, { color: "cyan", children: [
+        isCursor && item.hints?.map((h, j) => /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Text, { color: "cyan", dimColor: true, children: [
           "      + ",
           h
         ] }, j))
       ] }, item.value);
     }) }),
-    feedback ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Box_default, { marginTop: 1, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Text, { color: feedback.type === "warn" ? "yellow" : "cyan", children: [
-      feedback.type === "warn" ? "\u26A0 " : "\u2139 ",
+    feedback ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Box_default, { marginTop: 1, marginLeft: 2, children: /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(Text, { color: feedback.type === "warn" ? "yellow" : "cyan", children: [
+      feedback.type === "warn" ? "! " : "i ",
       feedback.text
     ] }) }) : null
   ] });
@@ -39480,13 +39500,51 @@ function StepSummary({
   });
   const allRoleNames = ["ceo", "engineer", ...roleNames];
   return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Box_default, { flexDirection: "column", gap: 1, children: [
-    capabilities.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Box_default, { flexDirection: "column", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { bold: true, children: "Capability resolution:" }),
-      capabilities.map((cap) => /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
+      Box_default,
+      {
+        flexDirection: "column",
+        borderStyle: "round",
+        borderColor: "cyan",
+        paddingX: 2,
+        paddingY: 1,
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { bold: true, color: "cyan", children: "Summary" }),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: " " }),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Row, { label: "Company", value: companyName }),
+          goal?.title ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Row, { label: "Goal", value: goal.title }) : null,
+          goal?.description ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Row, { label: "", value: goal.description, dim: true }) : null,
+          project?.name ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Row, { label: "Project", value: project.name }) : null,
+          project?.repoUrl ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Row, { label: "Repo", value: project.repoUrl, dim: true }) : null,
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Row, { label: "Preset", value: baseName }),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+            Row,
+            {
+              label: "Modules",
+              value: moduleNames.length > 0 ? moduleNames.join(", ") : "none"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+            Row,
+            {
+              label: "Roles",
+              value: allRoleNames.map((r) => formatRoleName(r)).join(", ")
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Row, { label: "Output", value: outputDir, dim: true }),
+          apiEnabled ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Row, { label: "API", value: "enabled", color: "green" }) : null
+        ]
+      }
+    ),
+    capabilities.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Box_default, { flexDirection: "column", marginLeft: 1, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { dimColor: true, children: "Capability resolution:" }),
+      capabilities.map((cap) => /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { dimColor: true, children: [
         "  ",
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: "cyan", children: cap.skill }),
-        ": ",
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { bold: true, children: cap.primary }),
+        cap.skill,
+        " ",
+        "->",
+        " ",
+        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: "cyan", children: cap.primary }),
         cap.fallbacks.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { dimColor: true, children: [
           " (fallback: ",
           cap.fallbacks.join(", "),
@@ -39494,58 +39552,16 @@ function StepSummary({
         ] }) : null
       ] }, cap.skill))
     ] }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Box_default, { flexDirection: "column", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { bold: true, children: "Summary:" }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-        "  Company:  ",
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: "cyan", children: companyName })
-      ] }),
-      goal?.title ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-        "  Goal:     ",
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: "cyan", children: goal.title })
-      ] }) : null,
-      project?.name ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Box_default, { flexDirection: "column", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-          "  Project:  ",
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: "cyan", children: project.name })
-        ] }),
-        project.repoUrl ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-          "  Repo:     ",
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { dimColor: true, children: project.repoUrl })
-        ] }) : null
-      ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-        "  Base:     ",
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: "cyan", children: baseName })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-        "  Modules:  ",
-        moduleNames.length > 0 ? moduleNames.map((m, i) => /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-          i > 0 ? ", " : "",
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: "cyan", children: m })
-        ] }, m)) : /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { dimColor: true, children: "none" })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-        "  Roles:    ",
-        allRoleNames.map((r, i) => /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-          i > 0 ? ", " : "",
-          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: "cyan", children: r })
-        ] }, r))
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-        "  Output:   ",
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { dimColor: true, children: outputDir })
-      ] }),
-      apiEnabled ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { children: [
-        "  API:      ",
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: "green", children: "enabled" }),
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { dimColor: true, children: " (will create company, goal, project, agents, issues)" })
-      ] }) : null
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Text, { bold: true, children: [
-      "Create? ",
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { dimColor: true, children: "[Y/n]" })
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Box_default, { marginLeft: 1, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { bold: true, children: "Create? " }),
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { dimColor: true, children: "y/n" })
     ] })
+  ] });
+}
+function Row({ label, value, dim, color }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(Box_default, { children: [
+    label ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { dimColor: true, children: label.padEnd(10) }) : /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: "          " }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { color: color || (dim ? void 0 : "white"), dimColor: dim, children: value })
   ] });
 }
 
@@ -40294,101 +40310,58 @@ function StepDone({
   return /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Box_default, { flexDirection: "column", gap: 1, children: [
     /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", bold: true, children: "Done!" }),
     provisioned && provisionResult ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Box_default, { flexDirection: "column", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { bold: true, children: "Provisioned via Paperclip API:" }),
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { bold: true, children: "Provisioned via Paperclip API" }),
       /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Box_default, { flexDirection: "column", marginLeft: 2, children: [
         /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "\u2713" }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "+" }),
           " Company",
           " ",
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { dimColor: true, children: [
-            "(",
-            provisionResult.companyId?.slice(0, 8),
-            "\u2026)"
-          ] })
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: provisionResult.companyId?.slice(0, 8) })
         ] }),
         provisionResult.goalId ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "\u2713" }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "+" }),
           " Goal",
           " ",
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { dimColor: true, children: [
-            "(",
-            provisionResult.goalId.slice(0, 8),
-            "\u2026)"
-          ] })
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: provisionResult.goalId.slice(0, 8) })
         ] }) : null,
         /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "\u2713" }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "+" }),
           " Project",
           " ",
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { dimColor: true, children: [
-            "(",
-            provisionResult.projectId?.slice(0, 8),
-            "\u2026)"
-          ] })
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: provisionResult.projectId?.slice(0, 8) })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { dimColor: true, children: [
           "  ",
-          "workspace \u2192 ",
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: provisionResult.projectCwd })
+          "workspace: ",
+          provisionResult.projectCwd
         ] }),
         rolesList.map((role) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "\u2713" }),
-          " Agent:",
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "+" }),
+          " Agent",
           " ",
           /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { bold: true, children: formatRoleName(role) }),
           " ",
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { dimColor: true, children: [
-            "(",
-            provisionResult.agentIds?.get(role)?.slice(0, 8),
-            "\u2026)"
-          ] })
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: provisionResult.agentIds?.get(role)?.slice(0, 8) })
         ] }, role)),
         provisionResult.issueIds?.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "\u2713" }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "+" }),
           " ",
           provisionResult.issueIds.length,
           " issue",
-          provisionResult.issueIds.length !== 1 ? "s" : "",
-          " created"
+          provisionResult.issueIds.length !== 1 ? "s" : ""
         ] }) : null,
         provisionResult.ceoStarted ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "\u2713" }),
+          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { color: "green", children: "+" }),
           " CEO heartbeat started"
         ] }) : null
       ] }),
       !provisionResult.ceoStarted ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Box_default, { flexDirection: "column", marginTop: 1, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { bold: true, children: "Next:" }),
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { children: "  Start the CEO heartbeat in the Paperclip UI" }),
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: "  or re-run with --start to auto-start" })
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: "Next: start the CEO heartbeat in the Paperclip UI" }),
+        /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: "  or re-run with --start" })
       ] }) : null
     ] }) : /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Box_default, { flexDirection: "column", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { bold: true, children: "Next steps:" }),
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { children: "  Follow BOOTSTRAP.md in the company directory." }),
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: "  Or re-run with --api to provision automatically." }),
-      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, {}),
-      rolesList.map((role, i) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Box_default, { flexDirection: "column", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { children: [
-          "  ",
-          i + 1,
-          ". Create the",
-          " ",
-          /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { bold: true, children: formatRoleName(role) }),
-          " agent:"
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { dimColor: true, children: [
-          "     ",
-          "cwd = ",
-          companyDir
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { dimColor: true, children: [
-          "     ",
-          "instructionsFilePath = ",
-          companyDir,
-          "/agents/",
-          role,
-          "/AGENTS.md"
-        ] })
-      ] }, role))
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: "Next: follow BOOTSTRAP.md in the company directory" }),
+      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Text, { dimColor: true, children: "  or re-run with --api to provision automatically" })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(Text, { dimColor: true, children: [
       "Workspace: ",
@@ -40578,6 +40551,17 @@ function App2({
     rolesData.set(r.name, r);
   }
   const companyDir = companyName ? `${outputDir}/${toPascalCase(companyName)}` : "";
+  const STEP_NUMBERS = {
+    [STEPS.NAME]: 1,
+    [STEPS.GOAL]: 2,
+    [STEPS.PROJECT]: 3,
+    [STEPS.PRESET]: 4,
+    [STEPS.MODULES]: 5,
+    [STEPS.ROLES]: 6,
+    [STEPS.SUMMARY]: 7
+  };
+  const TOTAL_STEPS = 7;
+  const currentStepNum = STEP_NUMBERS[step] || null;
   const handleError = (msg) => {
     setError(msg);
     setStep(STEPS.ERROR);
@@ -40612,7 +40596,7 @@ function App2({
     ]
   };
   return /* @__PURE__ */ (0, import_jsx_runtime14.jsxs)(Box_default, { flexDirection: "column", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Header, {}),
+    /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Header, { step: currentStepNum, totalSteps: TOTAL_STEPS }),
     step === STEPS.LOADING && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(Text, { dimColor: true, children: "Loading templates..." }),
     step === STEPS.NAME && /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
       StepName,

@@ -28,7 +28,8 @@ export default function StepGoal({ onComplete }) {
       {phase === "title" ? (
         <Box flexDirection="column">
           <Box>
-            <Text bold>Company goal: </Text>
+            <Text color="cyan" bold>? </Text>
+            <Text bold>Company goal </Text>
             <TextInput
               value={title}
               onChange={(v) => {
@@ -42,16 +43,17 @@ export default function StepGoal({ onComplete }) {
         </Box>
       ) : (
         <Box flexDirection="column">
-          <Text dimColor>Goal: {title}</Text>
+          <Text dimColor>  Goal: {title}</Text>
           <Box>
-            <Text bold>Description: </Text>
+            <Text color="cyan" bold>? </Text>
+            <Text bold>Description </Text>
             <TextInput
               value={description}
               onChange={setDescription}
               onSubmit={handleDescriptionSubmit}
             />
           </Box>
-          <Text dimColor>  Optional. Press enter to skip.</Text>
+          <Text dimColor>  Optional details. Press enter to skip.</Text>
         </Box>
       )}
       {error ? <Text color="red">  {error}</Text> : null}

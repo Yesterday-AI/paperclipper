@@ -6,33 +6,43 @@ export default function StepPreset({ presets, onComplete }) {
   const items = [
     ...presets.map((p) => ({
       key: p.name,
-      label: `${p.name} — ${p.description || ""}`,
+      label: `${p.name}`,
       value: p,
     })),
     {
       key: "custom",
-      label: "custom — Pick modules manually",
+      label: "custom",
       value: { name: "custom" },
     },
   ];
 
   return (
     <Box flexDirection="column">
-      <Text bold>Select a preset:</Text>
-      <Box marginTop={1}>
+      <Box>
+        <Text color="cyan" bold>? </Text>
+        <Text bold>Select a preset</Text>
+      </Box>
+      <Box marginLeft={2} marginTop={1} flexDirection="column">
         <SelectInput
           items={items}
           onSelect={(item) => onComplete(item.value)}
+          itemComponent={PresetItem}
         />
       </Box>
-      {presets
-        .filter((p) => p.constraints?.length)
-        .map((p) => (
-          <Text key={`constraint-${p.name}`} color="yellow">
-            {"  "}
-            {p.name}: {p.constraints[0]}
-          </Text>
-        ))}
+    </Box>
+  );
+}
+
+function PresetItem({ isSelected, label, value }) {
+  const desc = value?.description || (label === "custom" ? "Pick modules manually" : "");
+  return (
+    <Box>
+      <Text color={isSelected ? "cyan" : undefined} bold={isSelected}>
+        {label}
+      </Text>
+      {desc ? (
+        <Text dimColor> — {desc}</Text>
+      ) : null}
     </Box>
   );
 }

@@ -1,15 +1,18 @@
 import React from "react";
 import { Box, Text } from "ink";
 
-export default function Header() {
+export default function Header({ step, totalSteps }) {
   return (
-    <Box
-      borderStyle="round"
-      borderColor="magenta"
-      paddingX={2}
-      marginBottom={1}
-    >
-      <Text bold>Clipper</Text>
+    <Box flexDirection="column" marginBottom={1}>
+      <Box>
+        <Text bold color="magenta">Clipper</Text>
+        <Text dimColor> — Bootstrap a Paperclip company</Text>
+      </Box>
+      {step && totalSteps ? (
+        <Text dimColor>
+          Step {step}/{totalSteps}
+        </Text>
+      ) : null}
     </Box>
   );
 }

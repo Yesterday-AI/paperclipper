@@ -11,7 +11,12 @@ Clipper is a company-as-code bootstrapping CLI for the Paperclip AI agent platfo
 ```bash
 npm run build       # esbuild: src/cli.jsx → dist/cli.mjs (single ESM bundle)
 npm test            # node --test src/logic/*.test.js
-node dist/cli.mjs   # Run built CLI
+node dist/cli.mjs   # Run built CLI (interactive wizard)
+
+# Headless mode — skips the Ink wizard, plain stdout
+node dist/cli.mjs --name "Acme Corp" --preset fast
+node dist/cli.mjs --name "Acme Corp" --preset quality --goal "Ship MVP" \
+  --project MyApp --repo https://github.com/org/repo --api
 ```
 
 ## Architecture
@@ -22,7 +27,8 @@ node dist/cli.mjs   # Run built CLI
 
 ### Source Layout
 
-- `src/cli.jsx` — Entry point, CLI flag parsing, renders `<App>`
+- `src/cli.jsx` — Entry point, CLI flag parsing, routes to `<App>` (interactive) or `headless()`
+- `src/headless.js` — Non-interactive mode: runs assembly + provisioning with plain stdout logging
 - `src/app.jsx` — Main state machine, step transitions, derived state
 - `src/components/Step*.jsx` — One component per wizard step
 - `src/components/MultiSelect.jsx` — Reusable multi-select (used by StepModules, StepRoles)
@@ -61,6 +67,7 @@ This avoids duplicating identical skill files across roles. Most capabilities us
 
 ### Key Concepts
 
+- **Headless mode** — When `--name` and `--preset` are both provided, the CLI skips the Ink wizard entirely and runs assembly + provisioning via `src/headless.js` with plain stdout. Available flags: `--name`, `--goal`, `--goal-description`, `--project`, `--project-description`, `--repo`, `--preset`, `--modules` (comma-separated), `--roles` (comma-separated).
 - **Gracefully optimistic architecture** — Capabilities extend when roles are present, degrade gracefully when absent. A capability's `owners[]` chain determines primary/fallback assignment at assembly time.
 - **Shared vs role-specific skills** — Shared skills (`skills/`) work for any owner. Role-specific overrides (`agents/<role>/skills/`) exist only for genuinely different behavior. Fallbacks are always role-specific.
 - **role.json `adapter` field** — Per-agent model config (`model`, `effort`, etc.). `--model` CLI flag is a fallback.

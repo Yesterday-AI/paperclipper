@@ -76,31 +76,36 @@ export default function MultiSelect({
 
   return (
     <Box flexDirection="column">
-      {label ? <Text bold>{label}</Text> : null}
-      <Text dimColor>  ↑↓ navigate · space toggle · enter confirm</Text>
-      <Box marginTop={1} flexDirection="column">
+      <Box>
+        <Text color="cyan" bold>? </Text>
+        {label ? <Text bold>{label}</Text> : null}
+      </Box>
+      <Text dimColor>  space toggle  enter confirm</Text>
+      <Box marginTop={1} marginLeft={2} flexDirection="column">
         {items.map((item, i) => {
           const isSelected = selected.has(item.value);
           const isPreselected = preselected.includes(item.value);
           const isCursor = i === cursor;
           const marker = isSelected ? "◉" : "○";
-          const prefix = isCursor ? "❯" : " ";
 
           return (
             <Box key={item.value} flexDirection="column">
               <Box>
-                <Text color={isCursor ? "cyan" : undefined}>
-                  {prefix} {marker} {item.label}
+                <Text color={isCursor ? "cyan" : isSelected ? "green" : "gray"}>
+                  {isCursor ? ">" : " "} {marker}
+                </Text>
+                <Text color={isCursor ? "cyan" : undefined} bold={isCursor}>
+                  {" "}{item.label}
                 </Text>
                 {isPreselected ? (
-                  <Text color="green"> [included]</Text>
+                  <Text color="green" dimColor> preset</Text>
                 ) : null}
               </Box>
-              {item.description ? (
+              {isCursor && item.description ? (
                 <Text dimColor>      {item.description}</Text>
               ) : null}
-              {item.hints?.map((h, j) => (
-                <Text key={j} color="cyan">
+              {isCursor && item.hints?.map((h, j) => (
+                <Text key={j} color="cyan" dimColor>
                   {"      + "}
                   {h}
                 </Text>
@@ -110,9 +115,9 @@ export default function MultiSelect({
         })}
       </Box>
       {feedback ? (
-        <Box marginTop={1}>
+        <Box marginTop={1} marginLeft={2}>
           <Text color={feedback.type === "warn" ? "yellow" : "cyan"}>
-            {feedback.type === "warn" ? "⚠ " : "ℹ "}
+            {feedback.type === "warn" ? "! " : "i "}
             {feedback.text}
           </Text>
         </Box>

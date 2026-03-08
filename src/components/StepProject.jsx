@@ -36,23 +36,22 @@ export default function StepProject({ defaultName, companyDir, onComplete }) {
       {phase === "name" ? (
         <Box flexDirection="column">
           <Box>
-            <Text bold>Project name: </Text>
+            <Text color="cyan" bold>? </Text>
+            <Text bold>Project name </Text>
             <TextInput
               value={name}
               onChange={setName}
               onSubmit={handleNameSubmit}
             />
           </Box>
-          <Text dimColor>  Default: {defaultName}. Press enter to accept.</Text>
-          {projectPath ? (
-            <Text dimColor>  Workspace: {projectPath}</Text>
-          ) : null}
+          <Text dimColor>  Press enter for "{defaultName}"</Text>
         </Box>
       ) : phase === "description" ? (
         <Box flexDirection="column">
-          <Text dimColor>Project: {name}</Text>
+          <Text dimColor>  Project: {name}</Text>
           <Box>
-            <Text bold>Project description: </Text>
+            <Text color="cyan" bold>? </Text>
+            <Text bold>Project description </Text>
             <TextInput
               value={description}
               onChange={setDescription}
@@ -63,10 +62,11 @@ export default function StepProject({ defaultName, companyDir, onComplete }) {
         </Box>
       ) : (
         <Box flexDirection="column">
-          <Text dimColor>Project: {name}</Text>
+          <Text dimColor>  Project: {name}</Text>
           {description ? <Text dimColor>  {description}</Text> : null}
           <Box>
-            <Text bold>GitHub repo URL: </Text>
+            <Text color="cyan" bold>? </Text>
+            <Text bold>GitHub repo URL </Text>
             <TextInput
               value={repoUrl}
               onChange={setRepoUrl}

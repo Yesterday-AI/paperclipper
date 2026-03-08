@@ -4,6 +4,10 @@
 
 Clipper is a company-as-code bootstrapping CLI for the [Paperclip](https://github.com/paperclipai/paperclip) AI agent platform. It assembles ready-to-run company workspaces from modular, composable templates — turning the messy process of configuring agent roles, workflows, and processes into a single command.
 
+Clipper supports two usage modes:
+- **Interactive** — An Ink-based terminal wizard that walks through each configuration step (requires TTY).
+- **Headless** — Pass `--name` and `--preset` (minimum) as CLI flags to skip the wizard entirely. Runs assembly and optional API provisioning with plain stdout. Designed for scripting, CI pipelines, and programmatic use by other agents.
+
 ## Why
 
 The default Paperclip company setup is a blank slate: one CEO with a bootstrap prompt, no defined workflows, no process for generating issues, no review cycles. Every company starts from zero and reinvents the same patterns.

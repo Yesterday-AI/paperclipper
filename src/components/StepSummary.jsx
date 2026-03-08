@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Text, useInput } from "ink";
+import { formatRoleName } from "../logic/resolve.js";
 
 export default function StepSummary({
   companyName,
@@ -26,15 +27,41 @@ export default function StepSummary({
 
   return (
     <Box flexDirection="column" gap={1}>
+      <Box
+        flexDirection="column"
+        borderStyle="round"
+        borderColor="cyan"
+        paddingX={2}
+        paddingY={1}
+      >
+        <Text bold color="cyan">Summary</Text>
+        <Text> </Text>
+        <Row label="Company" value={companyName} />
+        {goal?.title ? <Row label="Goal" value={goal.title} /> : null}
+        {goal?.description ? <Row label="" value={goal.description} dim /> : null}
+        {project?.name ? <Row label="Project" value={project.name} /> : null}
+        {project?.repoUrl ? <Row label="Repo" value={project.repoUrl} dim /> : null}
+        <Row label="Preset" value={baseName} />
+        <Row
+          label="Modules"
+          value={moduleNames.length > 0 ? moduleNames.join(", ") : "none"}
+        />
+        <Row
+          label="Roles"
+          value={allRoleNames.map((r) => formatRoleName(r)).join(", ")}
+        />
+        <Row label="Output" value={outputDir} dim />
+        {apiEnabled ? (
+          <Row label="API" value="enabled" color="green" />
+        ) : null}
+      </Box>
+
       {capabilities.length > 0 ? (
-        <Box flexDirection="column">
-          <Text bold>Capability resolution:</Text>
+        <Box flexDirection="column" marginLeft={1}>
+          <Text dimColor>Capability resolution:</Text>
           {capabilities.map((cap) => (
-            <Text key={cap.skill}>
-              {"  "}
-              <Text color="cyan">{cap.skill}</Text>
-              {": "}
-              <Text bold>{cap.primary}</Text>
+            <Text key={cap.skill} dimColor>
+              {"  "}{cap.skill} {"->"} <Text color="cyan">{cap.primary}</Text>
               {cap.fallbacks.length > 0 ? (
                 <Text dimColor> (fallback: {cap.fallbacks.join(", ")})</Text>
               ) : null}
@@ -43,73 +70,24 @@ export default function StepSummary({
         </Box>
       ) : null}
 
-      <Box flexDirection="column">
-        <Text bold>Summary:</Text>
-        <Text>
-          {"  Company:  "}
-          <Text color="cyan">{companyName}</Text>
-        </Text>
-        {goal?.title ? (
-          <Text>
-            {"  Goal:     "}
-            <Text color="cyan">{goal.title}</Text>
-          </Text>
-        ) : null}
-        {project?.name ? (
-          <Box flexDirection="column">
-            <Text>
-              {"  Project:  "}
-              <Text color="cyan">{project.name}</Text>
-            </Text>
-            {project.repoUrl ? (
-              <Text>
-                {"  Repo:     "}
-                <Text dimColor>{project.repoUrl}</Text>
-              </Text>
-            ) : null}
-          </Box>
-        ) : null}
-        <Text>
-          {"  Base:     "}
-          <Text color="cyan">{baseName}</Text>
-        </Text>
-        <Text>
-          {"  Modules:  "}
-          {moduleNames.length > 0 ? (
-            moduleNames.map((m, i) => (
-              <Text key={m}>
-                {i > 0 ? ", " : ""}
-                <Text color="cyan">{m}</Text>
-              </Text>
-            ))
-          ) : (
-            <Text dimColor>none</Text>
-          )}
-        </Text>
-        <Text>
-          {"  Roles:    "}
-          {allRoleNames.map((r, i) => (
-            <Text key={r}>
-              {i > 0 ? ", " : ""}
-              <Text color="cyan">{r}</Text>
-            </Text>
-          ))}
-        </Text>
-        <Text>
-          {"  Output:   "}
-          <Text dimColor>{outputDir}</Text>
-        </Text>
-        {apiEnabled ? (
-          <Text>
-            {"  API:      "}
-            <Text color="green">enabled</Text>
-            <Text dimColor> (will create company, goal, project, agents, issues)</Text>
-          </Text>
-        ) : null}
+      <Box marginLeft={1}>
+        <Text bold>Create? </Text>
+        <Text dimColor>y/n</Text>
       </Box>
+    </Box>
+  );
+}
 
-      <Text bold>
-        Create? <Text dimColor>[Y/n]</Text>
+function Row({ label, value, dim, color }) {
+  return (
+    <Box>
+      {label ? (
+        <Text dimColor>{label.padEnd(10)}</Text>
+      ) : (
+        <Text>{"          "}</Text>
+      )}
+      <Text color={color || (dim ? undefined : "white")} dimColor={dim}>
+        {value}
       </Text>
     </Box>
   );

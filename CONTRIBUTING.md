@@ -16,10 +16,14 @@ npm run build
 ```sh
 npm run build          # esbuild: src/cli.jsx → dist/cli.mjs
 npm test               # node --test src/logic/*.test.js
-node dist/cli.mjs      # run the CLI
+node dist/cli.mjs      # run the CLI (interactive wizard, requires TTY)
+
+# Headless mode — no TTY required, works in scripts and CI
+node dist/cli.mjs --name "TestCo" --preset fast
+node dist/cli.mjs --name "TestCo" --preset quality --goal "Ship MVP" --api
 ```
 
-The CLI uses Ink (React for terminals) and requires a TTY — it won't work in piped or non-interactive contexts.
+The interactive wizard uses Ink (React for terminals) and requires a TTY — it won't work in piped or non-interactive contexts. Headless mode (`--name` + `--preset`) bypasses Ink entirely and uses plain stdout, so it works anywhere.
 
 ## Project Structure
 
