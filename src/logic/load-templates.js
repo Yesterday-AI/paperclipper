@@ -53,16 +53,33 @@ export async function loadModules(templatesDir) {
 }
 
 export async function loadRoles(templatesDir) {
-  const rolesDir = join(templatesDir, "roles");
   const roles = [];
-  if (!(await exists(rolesDir))) return roles;
-  const dirs = await readdir(rolesDir, { withFileTypes: true });
-  for (const dir of dirs) {
-    if (!dir.isDirectory()) continue;
-    const roleJson = await readJson(join(rolesDir, dir.name, "role.json"));
-    if (roleJson) {
-      roles.push(roleJson);
+
+  // Load base roles (ceo, engineer, etc.)
+  const baseDir = join(templatesDir, "base");
+  if (await exists(baseDir)) {
+    const baseDirs = await readdir(baseDir, { withFileTypes: true });
+    for (const dir of baseDirs) {
+      if (!dir.isDirectory()) continue;
+      const roleJson = await readJson(join(baseDir, dir.name, "role.json"));
+      if (roleJson) {
+        roles.push({ ...roleJson, _base: true });
+      }
     }
   }
+
+  // Load optional roles
+  const rolesDir = join(templatesDir, "roles");
+  if (await exists(rolesDir)) {
+    const dirs = await readdir(rolesDir, { withFileTypes: true });
+    for (const dir of dirs) {
+      if (!dir.isDirectory()) continue;
+      const roleJson = await readJson(join(rolesDir, dir.name, "role.json"));
+      if (roleJson) {
+        roles.push(roleJson);
+      }
+    }
+  }
+
   return roles;
 }

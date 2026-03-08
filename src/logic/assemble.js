@@ -44,6 +44,17 @@ async function readJson(p) {
 }
 
 /**
+ * Convert a company name to PascalCase for the directory name.
+ * "Black Mesa" → "BlackMesa", "my-company" → "MyCompany"
+ */
+function toPascalCase(name) {
+  return name
+    .split(/[\s\-_]+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join("");
+}
+
+/**
  * Assemble a company workspace from templates.
  *
  * @param {object} opts
@@ -65,7 +76,8 @@ export async function assembleCompany({
   templatesDir,
   onProgress = () => {},
 }) {
-  const companyDir = join(outputDir, companyName);
+  const dirName = toPascalCase(companyName);
+  const companyDir = join(outputDir, dirName);
 
   if (await exists(companyDir)) {
     throw new Error(`Company directory already exists: ${companyDir}`);

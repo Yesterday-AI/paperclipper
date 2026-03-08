@@ -13,6 +13,7 @@ import { formatRoleName } from "../logic/resolve.js";
  * @param {Set<string>} opts.allRoles
  * @param {Map<string, object>} opts.rolesData - role name → role.json data
  * @param {Array} opts.initialTasks
+ * @param {string|null} opts.model - LLM model fallback (overridden by role.json adapter.model)
  * @param {(line: string) => void} opts.onProgress
  * @returns {Promise<{companyId: string, agentIds: Map<string, string>}>}
  */
@@ -23,6 +24,7 @@ export async function provisionCompany({
   allRoles,
   rolesData = new Map(),
   initialTasks = [],
+  model = null,
   onProgress = () => {},
 }) {
   // 1. Create company
@@ -38,6 +40,10 @@ export async function provisionCompany({
     const paperclipRole = PaperclipClient.resolveRole(role, roleData);
     const title = formatRoleName(role);
 
+    // Role-specific adapter config from role.json, CLI --model as fallback
+    const roleAdapter = roleData?.adapter || {};
+    const agentModel = roleAdapter.model || model;
+
     onProgress(`Creating ${title} agent...`);
     const agent = await client.createAgent(companyId, {
       name: title,
@@ -46,21 +52,39 @@ export async function provisionCompany({
       adapterConfig: {
         cwd: companyDir,
         instructionsFilePath: join(companyDir, `agents/${role}/AGENTS.md`),
+        ...(agentModel ? { model: agentModel } : {}),
+        ...Object.fromEntries(
+          Object.entries(roleAdapter).filter(([k]) => k !== "model"),
+        ),
       },
     });
     agentIds.set(role, agent.id);
     onProgress(`✓ ${title} created (${agent.id.slice(0, 8)}…)`);
   }
 
-  // 3. Create initial tasks as issues
+  // 3. Create project with workspace pointing to company dir
+  onProgress("Creating project workspace...");
+  const project = await client.createProject(companyId, {
+    name: companyName,
+    description: `Company workspace for ${companyName}`,
+    workspace: {
+      cwd: companyDir,
+      isPrimary: true,
+    },
+  });
+  const projectId = project.id;
+  onProgress(`✓ Project created (${projectId.slice(0, 8)}…)`);
+
+  // 4. Create initial tasks as issues (linked to project)
   for (const task of initialTasks) {
     onProgress(`Creating issue: ${task.title}...`);
     await client.createIssue(companyId, {
       title: task.title,
       description: task.description,
+      projectId,
     });
     onProgress(`✓ Issue created: ${task.title}`);
   }
 
-  return { companyId, agentIds };
+  return { companyId, projectId, agentIds };
 }

@@ -39304,6 +39304,9 @@ async function readJson(p) {
   if (!await exists(p)) return null;
   return JSON.parse(await readFile(p, "utf-8"));
 }
+function toPascalCase(name) {
+  return name.split(/[\s\-_]+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");
+}
 async function assembleCompany({
   companyName,
   baseName,
@@ -39314,7 +39317,8 @@ async function assembleCompany({
   onProgress = () => {
   }
 }) {
-  const companyDir = join(outputDir, companyName);
+  const dirName = toPascalCase(companyName);
+  const companyDir = join(outputDir, dirName);
   if (await exists(companyDir)) {
     throw new Error(`Company directory already exists: ${companyDir}`);
   }
@@ -39660,13 +39664,24 @@ var PaperclipClient = class {
       })
     });
   }
-  async createIssue(companyId, { title, description, priority }) {
+  async createProject(companyId, { name, description, workspace }) {
+    return this._fetch(`/api/companies/${companyId}/projects`, {
+      method: "POST",
+      body: JSON.stringify({
+        name,
+        description: description || null,
+        workspace: workspace || void 0
+      })
+    });
+  }
+  async createIssue(companyId, { title, description, priority, projectId }) {
     return this._fetch(`/api/companies/${companyId}/issues`, {
       method: "POST",
       body: JSON.stringify({
         title,
         description: description || null,
-        priority: priority || "medium"
+        priority: priority || "medium",
+        projectId: projectId || void 0
       })
     });
   }
@@ -39724,6 +39739,7 @@ async function provisionCompany({
   allRoles,
   rolesData = /* @__PURE__ */ new Map(),
   initialTasks = [],
+  model = null,
   onProgress = () => {
   }
 }) {
@@ -39736,6 +39752,8 @@ async function provisionCompany({
     const roleData = rolesData.get(role);
     const paperclipRole = PaperclipClient.resolveRole(role, roleData);
     const title = formatRoleName(role);
+    const roleAdapter = roleData?.adapter || {};
+    const agentModel = roleAdapter.model || model;
     onProgress(`Creating ${title} agent...`);
     const agent = await client.createAgent(companyId, {
       name: title,
@@ -39743,21 +39761,37 @@ async function provisionCompany({
       title,
       adapterConfig: {
         cwd: companyDir,
-        instructionsFilePath: join2(companyDir, `agents/${role}/AGENTS.md`)
+        instructionsFilePath: join2(companyDir, `agents/${role}/AGENTS.md`),
+        ...agentModel ? { model: agentModel } : {},
+        ...Object.fromEntries(
+          Object.entries(roleAdapter).filter(([k]) => k !== "model")
+        )
       }
     });
     agentIds.set(role, agent.id);
     onProgress(`\u2713 ${title} created (${agent.id.slice(0, 8)}\u2026)`);
   }
+  onProgress("Creating project workspace...");
+  const project = await client.createProject(companyId, {
+    name: companyName,
+    description: `Company workspace for ${companyName}`,
+    workspace: {
+      cwd: companyDir,
+      isPrimary: true
+    }
+  });
+  const projectId = project.id;
+  onProgress(`\u2713 Project created (${projectId.slice(0, 8)}\u2026)`);
   for (const task of initialTasks) {
     onProgress(`Creating issue: ${task.title}...`);
     await client.createIssue(companyId, {
       title: task.title,
-      description: task.description
+      description: task.description,
+      projectId
     });
     onProgress(`\u2713 Issue created: ${task.title}`);
   }
-  return { companyId, agentIds };
+  return { companyId, projectId, agentIds };
 }
 
 // src/components/StepProvision.jsx
@@ -39769,6 +39803,7 @@ function StepProvision({
   rolesData,
   initialTasks,
   apiBaseUrl,
+  model,
   onComplete,
   onError
 }) {
@@ -39784,6 +39819,7 @@ function StepProvision({
       allRoles,
       rolesData,
       initialTasks,
+      model,
       onProgress: (line) => {
         if (!cancelled) {
           setLog((prev) => [...prev, line]);
@@ -39928,15 +39964,27 @@ async function loadModules(templatesDir) {
   return modules;
 }
 async function loadRoles(templatesDir) {
-  const rolesDir = join3(templatesDir, "roles");
   const roles = [];
-  if (!await exists2(rolesDir)) return roles;
-  const dirs = await readdir2(rolesDir, { withFileTypes: true });
-  for (const dir of dirs) {
-    if (!dir.isDirectory()) continue;
-    const roleJson = await readJson2(join3(rolesDir, dir.name, "role.json"));
-    if (roleJson) {
-      roles.push(roleJson);
+  const baseDir = join3(templatesDir, "base");
+  if (await exists2(baseDir)) {
+    const baseDirs = await readdir2(baseDir, { withFileTypes: true });
+    for (const dir of baseDirs) {
+      if (!dir.isDirectory()) continue;
+      const roleJson = await readJson2(join3(baseDir, dir.name, "role.json"));
+      if (roleJson) {
+        roles.push({ ...roleJson, _base: true });
+      }
+    }
+  }
+  const rolesDir = join3(templatesDir, "roles");
+  if (await exists2(rolesDir)) {
+    const dirs = await readdir2(rolesDir, { withFileTypes: true });
+    for (const dir of dirs) {
+      if (!dir.isDirectory()) continue;
+      const roleJson = await readJson2(join3(rolesDir, dir.name, "role.json"));
+      if (roleJson) {
+        roles.push(roleJson);
+      }
     }
   }
   return roles;
@@ -39956,7 +40004,7 @@ var STEPS = {
   DONE: "done",
   ERROR: "error"
 };
-function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl }) {
+function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model }) {
   const { exit } = use_app_default();
   const [step, setStep] = (0, import_react43.useState)(STEPS.LOADING);
   const [error, setError] = (0, import_react43.useState)(null);
@@ -40046,7 +40094,7 @@ function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl }) {
     step === STEPS.ROLES && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       StepRoles,
       {
-        roles: availableRoles,
+        roles: availableRoles.filter((r) => !r._base),
         preselected: preselectedRoles,
         onComplete: (roles) => {
           setSelectedRoles(roles);
@@ -40099,6 +40147,7 @@ function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl }) {
         rolesData,
         initialTasks: assemblyResult.initialTasks,
         apiBaseUrl,
+        model,
         onComplete: (result) => {
           setProvisionResult(result);
           setStep(STEPS.DONE);
@@ -40140,7 +40189,8 @@ function parseArgs(argv) {
   const config2 = {
     outputDir: join4(process.cwd(), "companies"),
     apiEnabled: false,
-    apiBaseUrl: "http://localhost:3100"
+    apiBaseUrl: "http://localhost:3100",
+    model: null
   };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--output" && args[i + 1]) {
@@ -40151,6 +40201,9 @@ function parseArgs(argv) {
     } else if (args[i] === "--api-url" && args[i + 1]) {
       config2.apiBaseUrl = args[i + 1];
       config2.apiEnabled = true;
+      i++;
+    } else if (args[i] === "--model" && args[i + 1]) {
+      config2.model = args[i + 1];
       i++;
     } else if (args[i] === "--help" || args[i] === "-h") {
       console.log(`
@@ -40163,6 +40216,7 @@ function parseArgs(argv) {
     --output <dir>     Output directory (default: ./companies/)
     --api              Provision via Paperclip API after assembly
     --api-url <url>    Paperclip API URL (default: http://localhost:3100)
+    --model <model>    LLM model for agents (default: adapter default)
     -h, --help         Show this help
 `);
       process.exit(0);
@@ -40178,7 +40232,8 @@ var app = render_default(
       outputDir: config.outputDir,
       templatesDir: TEMPLATES_DIR,
       apiEnabled: config.apiEnabled,
-      apiBaseUrl: config.apiBaseUrl
+      apiBaseUrl: config.apiBaseUrl,
+      model: config.model
     }
   )
 );

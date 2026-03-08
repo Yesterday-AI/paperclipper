@@ -28,7 +28,7 @@ const STEPS = {
   ERROR: "error",
 };
 
-export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl }) {
+export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model }) {
   const { exit } = useApp();
 
   const [step, setStep] = useState(STEPS.LOADING);
@@ -136,7 +136,7 @@ export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl })
 
       {step === STEPS.ROLES && (
         <StepRoles
-          roles={availableRoles}
+          roles={availableRoles.filter((r) => !r._base)}
           preselected={preselectedRoles}
           onComplete={(roles) => {
             setSelectedRoles(roles);
@@ -189,6 +189,7 @@ export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl })
           rolesData={rolesData}
           initialTasks={assemblyResult.initialTasks}
           apiBaseUrl={apiBaseUrl}
+          model={model}
           onComplete={(result) => {
             setProvisionResult(result);
             setStep(STEPS.DONE);

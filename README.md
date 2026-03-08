@@ -17,7 +17,7 @@ npm i -g @yesterday-ai/paperclipper
 clipper
 ```
 
-No dependencies. Node.js 18+.
+Requires Node.js 20+.
 
 ## Usage
 
@@ -58,13 +58,26 @@ $ clipper
 ### Options
 
 ```sh
-clipper --output /path/to/companies   # custom output directory
+clipper                                # interactive wizard, output to ./companies/
+clipper --output /path/to/companies    # custom output directory
+clipper --api                          # also provision via Paperclip API
+clipper --api --model claude-opus-4-6  # set default model for all agents
+clipper --api-url http://host:3100     # custom API URL (implies --api)
 ```
+
+| Flag | Description | Default |
+| ---- | ----------- | ------- |
+| `--output <dir>` | Output directory for company workspaces | `./companies/` |
+| `--api` | Provision company, agents, project, and issues via Paperclip API after file assembly | off |
+| `--api-url <url>` | Paperclip API URL (implies `--api`) | `http://localhost:3100` |
+| `--model <model>` | Default LLM model for all agents (overridden by `role.json` per-role config) | adapter default |
+
+The company directory name is PascalCase: "Black Mesa" → `companies/BlackMesa/`.
 
 ## What You Get
 
 ```text
-companies/Acme/
+companies/AcmeCorp/
 ├── agents/
 │   ├── ceo/
 │   │   ├── AGENTS.md           # Identity, references, skill list
@@ -132,13 +145,21 @@ Primary owners get the full skill. Fallback owners get a safety-net variant that
 
 ## After Clipper
 
-Once the workspace is assembled, set up agents in the Paperclip UI:
+### With `--api` (recommended)
+
+Clipper provisions everything automatically: company, agents (with correct `cwd` and `instructionsFilePath`), a project workspace, and initial issues. Just start the CEO heartbeat.
+
+### Without `--api`
+
+Set up manually in the Paperclip UI:
 
 1. Create the company
-2. For each agent, configure:
-   - **cwd** → path to `companies/<name>/`
-   - **instructionsFilePath** → `agents/<role>/AGENTS.md`
-3. Start the CEO heartbeat
+2. Create a project with a workspace pointing to `companies/<Name>/`
+3. For each agent, configure:
+   - **cwd** → absolute path to `companies/<Name>/`
+   - **instructionsFilePath** → absolute path to `companies/<Name>/agents/<role>/AGENTS.md`
+4. Create initial issues (see `BOOTSTRAP.md` in the company directory)
+5. Start the CEO heartbeat
 
 ## Extending
 
@@ -176,12 +197,32 @@ templates/modules/<name>/
 
 ```text
 templates/roles/<name>/
-├── role.json                    # Name, title, description, reportsTo, enhances
+├── role.json                    # Name, title, description, reportsTo, enhances, adapter
 ├── AGENTS.md
 ├── SOUL.md
 ├── HEARTBEAT.md
 └── TOOLS.md
 ```
+
+#### role.json
+
+```json
+{
+  "name": "my-role",
+  "title": "My Role",
+  "paperclipRole": "general",
+  "description": "What this role does",
+  "reportsTo": "ceo",
+  "enhances": ["Takes over X from CEO"],
+  "adapter": {
+    "model": "claude-sonnet-4-6",
+    "effort": "medium"
+  }
+}
+```
+
+- `paperclipRole` — maps to a Paperclip `AGENT_ROLE` enum: `ceo`, `engineer`, `pm`, `qa`, `designer`, `cto`, `cmo`, `cfo`, `devops`, `researcher`, `general`
+- `adapter` — passed directly to `adapterConfig` during API provisioning. Supports any field the adapter accepts: `model`, `effort`, `maxTurnsPerRun`, etc. The `--model` CLI flag is used as fallback when `adapter.model` is not set.
 
 ### Add a preset
 
