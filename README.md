@@ -1,21 +1,31 @@
 # Clipper
 
-> Bootstrap a [Paperclip](https://github.com/paperclipai/paperclip) company workspace from modular templates.
+**Company as code.** Bootstrap AI agent teams from modular templates.
 
-Clipper assembles a ready-to-run company workspace by combining a base org structure with composable modules and optional specialist roles. Capabilities adapt gracefully — adding a Product Owner makes it the primary owner of backlog management, with the CEO as automatic fallback. Adding a UX Researcher makes them the primary market analyst. The system works with just CEO + Engineer and gets better as you add roles.
+[![npm version](https://img.shields.io/npm/v/@yesterday-ai/paperclipper)](https://www.npmjs.com/package/@yesterday-ai/paperclipper)
+[![CI](https://github.com/Yesterday-AI/paperclipper/actions/workflows/ci.yml/badge.svg)](https://github.com/Yesterday-AI/paperclipper/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
+
+---
+
+Clipper is a CLI and template system for [Paperclip](https://github.com/paperclipai/paperclip) — the control plane for AI-agent companies. It assembles ready-to-run company workspaces by combining a base org (CEO + Engineer) with composable modules and optional specialist roles.
+
+Capabilities adapt gracefully: adding a Product Owner makes it the primary owner of backlog management, with the CEO as automatic fallback. Adding a UX Researcher makes them the primary market analyst. The system works with just two roles and gets better as you add more.
+
+## Quick Start
+
+```sh
+npx @yesterday-ai/paperclipper
+```
+
+That's it. The interactive wizard handles the rest. Add `--api` to auto-provision in your local [Paperclip](https://github.com/paperclipai/paperclip) instance.
 
 ## Install
 
 ```sh
-mkdir ~/.paperclipper && cd ~/.paperclipper
-npx @yesterday-ai/paperclipper
-```
-
-Or install globally:
-
-```sh
-npm i -g @yesterday-ai/paperclipper
-clipper
+npx @yesterday-ai/paperclipper           # run directly
+npm i -g @yesterday-ai/paperclipper      # or install globally → clipper
 ```
 
 Requires Node.js 20+.
@@ -528,6 +538,10 @@ The wizard collects: company name, goal, project (name + repo), preset, modules,
 5. Creates initial issues linked to goal and project
 6. Optionally starts CEO heartbeat (`--start`)
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+
 ## License
 
-MIT
+[MIT](LICENSE) - Yesterday
