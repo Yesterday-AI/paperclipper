@@ -16,6 +16,7 @@ import {
   resolveCapabilities,
   buildAllRoles,
 } from "./logic/resolve.js";
+import { toPascalCase } from "./logic/assemble.js";
 
 const STEPS = {
   LOADING: "loading",
@@ -32,7 +33,7 @@ const STEPS = {
   ERROR: "error",
 };
 
-export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model }) {
+export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model, startCeo }) {
   const { exit } = useApp();
 
   const [step, setStep] = useState(STEPS.LOADING);
@@ -121,6 +122,7 @@ export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, m
       {step === STEPS.PROJECT && (
         <StepProject
           defaultName={companyName}
+          companyDir={`${outputDir}/${toPascalCase(companyName)}`}
           onComplete={(p) => {
             setProject(p);
             setStep(STEPS.PRESET);
@@ -179,7 +181,7 @@ export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, m
           moduleNames={selectedModules}
           roleNames={selectedRoles}
           capabilities={capabilities}
-          outputDir={outputDir}
+          outputDir={`${outputDir}/${toPascalCase(companyName)}`}
           apiEnabled={apiEnabled}
           onConfirm={() => setStep(STEPS.ASSEMBLE)}
           onCancel={() => {
@@ -221,6 +223,7 @@ export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, m
           initialTasks={assemblyResult.initialTasks}
           apiBaseUrl={apiBaseUrl}
           model={model}
+          startCeo={startCeo}
           onComplete={(result) => {
             setProvisionResult(result);
             setStep(STEPS.DONE);
@@ -245,7 +248,7 @@ export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, m
             companyDir={assemblyResult.companyDir}
             allRoles={assemblyResult.allRoles}
             provisioned={!!provisionResult}
-            companyId={provisionResult?.companyId}
+            provisionResult={provisionResult}
           />
         </Box>
       )}

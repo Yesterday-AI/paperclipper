@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
 
-export default function StepProject({ defaultName, onComplete }) {
+export default function StepProject({ defaultName, companyDir, onComplete }) {
   const [phase, setPhase] = useState("name"); // name → repo
   const [name, setName] = useState(defaultName);
   const [repoUrl, setRepoUrl] = useState("");
@@ -17,6 +17,10 @@ export default function StepProject({ defaultName, onComplete }) {
     onComplete({ name, repoUrl: val.trim() || null });
   };
 
+  const projectPath = companyDir
+    ? `${companyDir}/projects/${name || defaultName}`
+    : null;
+
   return (
     <Box flexDirection="column">
       {phase === "name" ? (
@@ -30,10 +34,16 @@ export default function StepProject({ defaultName, onComplete }) {
             />
           </Box>
           <Text dimColor>  Default: {defaultName}. Press enter to accept.</Text>
+          {projectPath ? (
+            <Text dimColor>  Workspace: {projectPath}</Text>
+          ) : null}
         </Box>
       ) : (
         <Box flexDirection="column">
           <Text dimColor>Project: {name}</Text>
+          {projectPath ? (
+            <Text dimColor>  Workspace: {projectPath}</Text>
+          ) : null}
           <Box>
             <Text bold>GitHub repo URL: </Text>
             <TextInput

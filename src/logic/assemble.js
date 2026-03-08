@@ -47,7 +47,7 @@ async function readJson(p) {
  * Convert a company name to PascalCase for the directory name.
  * "Black Mesa" → "BlackMesa", "my-company" → "MyCompany"
  */
-function toPascalCase(name) {
+export function toPascalCase(name) {
   return name
     .split(/[\s\-_]+/)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))

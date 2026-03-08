@@ -23,6 +23,7 @@ import { formatRoleName } from "../logic/resolve.js";
  * @param {Map<string, object>} opts.rolesData - role name → role.json data
  * @param {Array} opts.initialTasks
  * @param {string|null} opts.model - LLM model fallback (overridden by role.json adapter.model)
+ * @param {boolean} opts.startCeo - trigger CEO heartbeat after provisioning
  * @param {(line: string) => void} opts.onProgress
  */
 export async function provisionCompany({
@@ -36,6 +37,7 @@ export async function provisionCompany({
   rolesData = new Map(),
   initialTasks = [],
   model = null,
+  startCeo = false,
   onProgress = () => {},
 }) {
   // 1. Create company
@@ -58,18 +60,20 @@ export async function provisionCompany({
   }
 
   // 3. Create project with workspace
+  const projectCwd = join(companyDir, "projects", projectName);
   onProgress(`Creating project "${projectName}"...`);
   const project = await client.createProject(companyId, {
     name: projectName,
     description: goal?.title ? `Goal: ${goal.title}` : null,
     workspace: {
-      cwd: companyDir,
+      cwd: projectCwd,
       ...(repoUrl ? { repoUrl } : {}),
       isPrimary: true,
     },
   });
   const projectId = project.id;
-  onProgress(`✓ Project created with workspace → ${companyDir}`);
+  onProgress(`✓ Project "${projectName}" created`);
+  onProgress(`  workspace: ${projectCwd}`);
   if (repoUrl) {
     onProgress(`  repo: ${repoUrl}`);
   }
@@ -104,16 +108,42 @@ export async function provisionCompany({
   }
 
   // 5. Create initial issues (linked to goal + project)
+  const issueIds = [];
   for (const task of initialTasks) {
     onProgress(`Creating issue: ${task.title}...`);
-    await client.createIssue(companyId, {
+    const issue = await client.createIssue(companyId, {
       title: task.title,
       description: task.description,
       projectId,
       goalId,
     });
+    issueIds.push(issue.id);
     onProgress(`✓ Issue created: ${task.title}`);
   }
 
-  return { companyId, projectId, goalId, agentIds };
+  // 6. Optionally start CEO heartbeat
+  let ceoStarted = false;
+  if (startCeo) {
+    const ceoAgentId = agentIds.get("ceo");
+    if (ceoAgentId) {
+      onProgress("Starting CEO heartbeat...");
+      try {
+        await client.triggerHeartbeat(ceoAgentId);
+        ceoStarted = true;
+        onProgress("✓ CEO heartbeat started");
+      } catch (err) {
+        onProgress(`! Could not start CEO heartbeat: ${err.message}`);
+      }
+    }
+  }
+
+  return {
+    companyId,
+    goalId,
+    projectId,
+    projectCwd,
+    agentIds,
+    issueIds,
+    ceoStarted,
+  };
 }

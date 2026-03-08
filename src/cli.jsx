@@ -15,6 +15,7 @@ function parseArgs(argv) {
     apiEnabled: false,
     apiBaseUrl: "http://localhost:3100",
     model: null,
+    startCeo: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -27,6 +28,9 @@ function parseArgs(argv) {
       config.apiBaseUrl = args[i + 1];
       config.apiEnabled = true;
       i++;
+    } else if (args[i] === "--start") {
+      config.startCeo = true;
+      config.apiEnabled = true;
     } else if (args[i] === "--model" && args[i + 1]) {
       config.model = args[i + 1];
       i++;
@@ -42,6 +46,7 @@ function parseArgs(argv) {
     --api              Provision via Paperclip API after assembly
     --api-url <url>    Paperclip API URL (default: http://localhost:3100)
     --model <model>    LLM model for agents (default: adapter default)
+    --start            Start CEO heartbeat after provisioning (implies --api)
     -h, --help         Show this help
 `);
       process.exit(0);
@@ -60,6 +65,7 @@ const app = render(
     apiEnabled={config.apiEnabled}
     apiBaseUrl={config.apiBaseUrl}
     model={config.model}
+    startCeo={config.startCeo}
   />
 );
 

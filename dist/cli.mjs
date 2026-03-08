@@ -38664,7 +38664,7 @@ function StepGoal({ onComplete }) {
 // src/components/StepProject.jsx
 var import_react33 = __toESM(require_react(), 1);
 var import_jsx_runtime4 = __toESM(require_jsx_runtime(), 1);
-function StepProject({ defaultName, onComplete }) {
+function StepProject({ defaultName, companyDir, onComplete }) {
   const [phase, setPhase] = (0, import_react33.useState)("name");
   const [name, setName] = (0, import_react33.useState)(defaultName);
   const [repoUrl, setRepoUrl] = (0, import_react33.useState)("");
@@ -38676,6 +38676,7 @@ function StepProject({ defaultName, onComplete }) {
   const handleRepoSubmit = (val) => {
     onComplete({ name, repoUrl: val.trim() || null });
   };
+  const projectPath = companyDir ? `${companyDir}/projects/${name || defaultName}` : null;
   return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Box_default, { flexDirection: "column", children: phase === "name" ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Box_default, { flexDirection: "column", children: [
     /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Box_default, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { bold: true, children: "Project name: " }),
@@ -38692,12 +38693,20 @@ function StepProject({ defaultName, onComplete }) {
       "  Default: ",
       defaultName,
       ". Press enter to accept."
-    ] })
+    ] }),
+    projectPath ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Text, { dimColor: true, children: [
+      "  Workspace: ",
+      projectPath
+    ] }) : null
   ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Box_default, { flexDirection: "column", children: [
     /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Text, { dimColor: true, children: [
       "Project: ",
       name
     ] }),
+    projectPath ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Text, { dimColor: true, children: [
+      "  Workspace: ",
+      projectPath
+    ] }) : null,
     /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(Box_default, { children: [
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Text, { bold: true, children: "GitHub repo URL: " }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -39879,6 +39888,11 @@ var PaperclipClient = class {
       })
     });
   }
+  async triggerHeartbeat(agentId) {
+    return this._fetch(`/api/agents/${agentId}/heartbeat/invoke`, {
+      method: "POST"
+    });
+  }
   /**
    * Resolve a clipper role name to a Paperclip API role enum.
    * Uses role.json's paperclipRole field, falls back to 'general'.
@@ -39937,6 +39951,7 @@ async function provisionCompany({
   rolesData = /* @__PURE__ */ new Map(),
   initialTasks = [],
   model = null,
+  startCeo = false,
   onProgress = () => {
   }
 }) {
@@ -39955,18 +39970,20 @@ async function provisionCompany({
     goalId = g.id;
     onProgress(`\u2713 Goal created: ${goal.title}`);
   }
+  const projectCwd = join2(companyDir, "projects", projectName);
   onProgress(`Creating project "${projectName}"...`);
   const project = await client.createProject(companyId, {
     name: projectName,
     description: goal?.title ? `Goal: ${goal.title}` : null,
     workspace: {
-      cwd: companyDir,
+      cwd: projectCwd,
       ...repoUrl ? { repoUrl } : {},
       isPrimary: true
     }
   });
   const projectId = project.id;
-  onProgress(`\u2713 Project created with workspace \u2192 ${companyDir}`);
+  onProgress(`\u2713 Project "${projectName}" created`);
+  onProgress(`  workspace: ${projectCwd}`);
   if (repoUrl) {
     onProgress(`  repo: ${repoUrl}`);
   }
@@ -39994,17 +40011,41 @@ async function provisionCompany({
     agentIds.set(role, agent.id);
     onProgress(`\u2713 ${title} agent created`);
   }
+  const issueIds = [];
   for (const task of initialTasks) {
     onProgress(`Creating issue: ${task.title}...`);
-    await client.createIssue(companyId, {
+    const issue = await client.createIssue(companyId, {
       title: task.title,
       description: task.description,
       projectId,
       goalId
     });
+    issueIds.push(issue.id);
     onProgress(`\u2713 Issue created: ${task.title}`);
   }
-  return { companyId, projectId, goalId, agentIds };
+  let ceoStarted = false;
+  if (startCeo) {
+    const ceoAgentId = agentIds.get("ceo");
+    if (ceoAgentId) {
+      onProgress("Starting CEO heartbeat...");
+      try {
+        await client.triggerHeartbeat(ceoAgentId);
+        ceoStarted = true;
+        onProgress("\u2713 CEO heartbeat started");
+      } catch (err) {
+        onProgress(`! Could not start CEO heartbeat: ${err.message}`);
+      }
+    }
+  }
+  return {
+    companyId,
+    goalId,
+    projectId,
+    projectCwd,
+    agentIds,
+    issueIds,
+    ceoStarted
+  };
 }
 
 // src/components/StepProvision.jsx
@@ -40019,6 +40060,7 @@ function StepProvision({
   initialTasks,
   apiBaseUrl,
   model,
+  startCeo,
   onComplete,
   onError
 }) {
@@ -40038,6 +40080,7 @@ function StepProvision({
       rolesData,
       initialTasks,
       model,
+      startCeo,
       onProgress: (line) => {
         if (!cancelled) {
           setLog((prev) => [...prev, line]);
@@ -40087,40 +40130,103 @@ function StepDone({
   companyDir,
   allRoles,
   provisioned,
-  companyId
+  provisionResult
 }) {
   const rolesList = [...allRoles];
   return /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Box_default, { flexDirection: "column", gap: 1, children: [
     /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { color: "green", bold: true, children: "Done!" }),
-    provisioned ? /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Box_default, { flexDirection: "column", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { bold: true, children: "Company provisioned via API:" }),
-      /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { dimColor: true, children: [
-        "  ID: ",
-        companyId
+    provisioned && provisionResult ? /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Box_default, { flexDirection: "column", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { bold: true, children: "Provisioned via Paperclip API:" }),
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Box_default, { flexDirection: "column", marginLeft: 2, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { color: "green", children: "\u2713" }),
+          " Company",
+          " ",
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { dimColor: true, children: [
+            "(",
+            provisionResult.companyId?.slice(0, 8),
+            "\u2026)"
+          ] })
+        ] }),
+        provisionResult.goalId ? /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { color: "green", children: "\u2713" }),
+          " Goal",
+          " ",
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { dimColor: true, children: [
+            "(",
+            provisionResult.goalId.slice(0, 8),
+            "\u2026)"
+          ] })
+        ] }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { color: "green", children: "\u2713" }),
+          " Project",
+          " ",
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { dimColor: true, children: [
+            "(",
+            provisionResult.projectId?.slice(0, 8),
+            "\u2026)"
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { children: [
+          "  ",
+          "workspace \u2192 ",
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { dimColor: true, children: provisionResult.projectCwd })
+        ] }),
+        rolesList.map((role) => /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { color: "green", children: "\u2713" }),
+          " Agent:",
+          " ",
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { bold: true, children: formatRoleName(role) }),
+          " ",
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { dimColor: true, children: [
+            "(",
+            provisionResult.agentIds?.get(role)?.slice(0, 8),
+            "\u2026)"
+          ] })
+        ] }, role)),
+        provisionResult.issueIds?.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { color: "green", children: "\u2713" }),
+          " ",
+          provisionResult.issueIds.length,
+          " issue",
+          provisionResult.issueIds.length !== 1 ? "s" : "",
+          " created"
+        ] }) : null,
+        provisionResult.ceoStarted ? /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { children: [
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { color: "green", children: "\u2713" }),
+          " CEO heartbeat started"
+        ] }) : null
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { dimColor: true, children: "  All agents created and initial tasks queued." }),
-      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, {}),
-      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { bold: true, children: "Next:" }),
-      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { children: "  1. Start the CEO heartbeat in the Paperclip UI" })
+      !provisionResult.ceoStarted ? /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Box_default, { flexDirection: "column", marginTop: 1, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { bold: true, children: "Next:" }),
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { children: "  Start the CEO heartbeat in the Paperclip UI" }),
+        /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { dimColor: true, children: "  or re-run with --start to auto-start" })
+      ] }) : null
     ] }) : /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Box_default, { flexDirection: "column", children: [
       /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { bold: true, children: "Next steps:" }),
-      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { children: "  1. Create the company in the Paperclip UI" }),
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { children: "  Follow BOOTSTRAP.md in the company directory." }),
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { dimColor: true, children: "  Or re-run with --api to provision automatically." }),
+      /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, {}),
       rolesList.map((role, i) => /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Box_default, { flexDirection: "column", children: [
         /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { children: [
           "  ",
-          i + 2,
-          ". Create the ",
-          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { bold: true, children: formatRoleName(role) }),
+          i + 1,
+          ". Create the",
           " ",
-          "agent with:"
+          /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { bold: true, children: formatRoleName(role) }),
+          " agent:"
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { dimColor: true, children: [
-          "     cwd = ",
+          "     ",
+          "cwd = ",
           companyDir
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(Text, { dimColor: true, children: [
           "     ",
-          "instructionsFilePath = agents/",
+          "instructionsFilePath = ",
+          companyDir,
+          "/agents/",
           role,
           "/AGENTS.md"
         ] })
@@ -40224,7 +40330,7 @@ var STEPS = {
   DONE: "done",
   ERROR: "error"
 };
-function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model }) {
+function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model, startCeo }) {
   const { exit } = use_app_default();
   const [step, setStep] = (0, import_react45.useState)(STEPS.LOADING);
   const [error, setError] = (0, import_react45.useState)(null);
@@ -40295,6 +40401,7 @@ function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model }) {
       StepProject,
       {
         defaultName: companyName,
+        companyDir: `${outputDir}/${toPascalCase(companyName)}`,
         onComplete: (p) => {
           setProject(p);
           setStep(STEPS.PRESET);
@@ -40353,7 +40460,7 @@ function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model }) {
         moduleNames: selectedModules,
         roleNames: selectedRoles,
         capabilities,
-        outputDir,
+        outputDir: `${outputDir}/${toPascalCase(companyName)}`,
         apiEnabled,
         onConfirm: () => setStep(STEPS.ASSEMBLE),
         onCancel: () => {
@@ -40395,6 +40502,7 @@ function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model }) {
         initialTasks: assemblyResult.initialTasks,
         apiBaseUrl,
         model,
+        startCeo,
         onComplete: (result) => {
           setProvisionResult(result);
           setStep(STEPS.DONE);
@@ -40416,7 +40524,7 @@ function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model }) {
           companyDir: assemblyResult.companyDir,
           allRoles: assemblyResult.allRoles,
           provisioned: !!provisionResult,
-          companyId: provisionResult?.companyId
+          provisionResult
         }
       )
     ] }),
@@ -40437,7 +40545,8 @@ function parseArgs(argv) {
     outputDir: join4(process.cwd(), "companies"),
     apiEnabled: false,
     apiBaseUrl: "http://localhost:3100",
-    model: null
+    model: null,
+    startCeo: false
   };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--output" && args[i + 1]) {
@@ -40449,6 +40558,9 @@ function parseArgs(argv) {
       config2.apiBaseUrl = args[i + 1];
       config2.apiEnabled = true;
       i++;
+    } else if (args[i] === "--start") {
+      config2.startCeo = true;
+      config2.apiEnabled = true;
     } else if (args[i] === "--model" && args[i + 1]) {
       config2.model = args[i + 1];
       i++;
@@ -40464,6 +40576,7 @@ function parseArgs(argv) {
     --api              Provision via Paperclip API after assembly
     --api-url <url>    Paperclip API URL (default: http://localhost:3100)
     --model <model>    LLM model for agents (default: adapter default)
+    --start            Start CEO heartbeat after provisioning (implies --api)
     -h, --help         Show this help
 `);
       process.exit(0);
@@ -40480,7 +40593,8 @@ var app = render_default(
       templatesDir: TEMPLATES_DIR,
       apiEnabled: config.apiEnabled,
       apiBaseUrl: config.apiBaseUrl,
-      model: config.model
+      model: config.model,
+      startCeo: config.startCeo
     }
   )
 );

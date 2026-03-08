@@ -12,7 +12,8 @@
   ],
   "scripts": {
     "build": "node esbuild.config.mjs",
-    "dev": "node --experimental-strip-types src/cli.jsx"
+    "dev": "node --experimental-strip-types src/cli.jsx",
+    "test": "node --test src/logic/*.test.js"
   },
   "keywords": [
     "paperclip",

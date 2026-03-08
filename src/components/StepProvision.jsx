@@ -14,6 +14,7 @@ export default function StepProvision({
   initialTasks,
   apiBaseUrl,
   model,
+  startCeo,
   onComplete,
   onError,
 }) {
@@ -35,6 +36,7 @@ export default function StepProvision({
       rolesData,
       initialTasks,
       model,
+      startCeo,
       onProgress: (line) => {
         if (!cancelled) {
           setLog((prev) => [...prev, line]);

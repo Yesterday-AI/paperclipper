@@ -90,6 +90,12 @@ export class PaperclipClient {
     });
   }
 
+  async triggerHeartbeat(agentId) {
+    return this._fetch(`/api/agents/${agentId}/heartbeat/invoke`, {
+      method: "POST",
+    });
+  }
+
   /**
    * Resolve a clipper role name to a Paperclip API role enum.
    * Uses role.json's paperclipRole field, falls back to 'general'.

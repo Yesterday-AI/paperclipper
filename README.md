@@ -7,6 +7,7 @@ Clipper assembles a ready-to-run company workspace by combining a base org struc
 ## Install
 
 ```sh
+mkdir ~/.paperclipper && cd ~/.paperclipper
 npx @yesterday-ai/paperclipper
 ```
 
@@ -60,7 +61,7 @@ $ clipper --api
     Repo:     https://github.com/acme/widgets
     Modules:  github-repo, roadmap-to-issues, auto-assign, stall-detection
     Roles:    ceo, engineer
-    Output:   ./companies/
+    Output:   ./companies/AcmeCorp
     API:      enabled (will create company, goal, project, agents, issues)
 
   Create? [Y/n]:
@@ -72,6 +73,7 @@ $ clipper --api
 clipper                                # interactive wizard, output to ./companies/
 clipper --output /path/to/companies    # custom output directory
 clipper --api                          # also provision via Paperclip API
+clipper --api --start                  # provision and start CEO heartbeat
 clipper --api --model claude-opus-4-6  # set default model for all agents
 clipper --api-url http://host:3100     # custom API URL (implies --api)
 ```
@@ -82,6 +84,7 @@ clipper --api-url http://host:3100     # custom API URL (implies --api)
 | `--api` | Provision company, goal, project, agents, and issues via Paperclip API after file assembly | off |
 | `--api-url <url>` | Paperclip API URL (implies `--api`) | `http://localhost:3100` |
 | `--model <model>` | Default LLM model for all agents (overridden by `role.json` per-role config) | adapter default |
+| `--start` | Start CEO heartbeat after provisioning (implies `--api`) | off |
 
 The company directory name is PascalCase: "Black Mesa" → `companies/BlackMesa/`.
 
@@ -105,6 +108,8 @@ companies/AcmeCorp/
 │   │   └── ...
 │   └── code-reviewer/              (if role selected)
 │       └── ...
+├── projects/                       # Project workspace(s)
+│   └── <ProjectName>/              # cwd for agent heartbeats
 └── docs/                           # Shared workflows from modules
 ```
 
@@ -152,11 +157,12 @@ Clipper provisions everything in the local Paperclip instance automatically:
 
 1. **Company** — created with the name you entered
 2. **Goal** — company-level goal with your title and description, set to `active`
-3. **Project** — with a workspace pointing to the assembled directory (and GitHub repo if provided)
+3. **Project** — with a workspace pointing to `companies/<Name>/projects/<ProjectName>/` (and GitHub repo if provided)
 4. **Agents** — one per role, each with correct absolute `cwd`, `instructionsFilePath`, model, and adapter config from `role.json`
 5. **Issues** — initial tasks from modules, linked to the goal and project
+6. **CEO heartbeat** — optionally started with `--start`
 
-After provisioning, just start the CEO heartbeat.
+After provisioning, the CLI shows a detailed summary of every created resource with IDs.
 
 ### Without `--api`
 
@@ -258,9 +264,10 @@ The wizard collects: company name, goal, project (name + repo), preset, modules,
 
 1. Creates company in Paperclip
 2. Creates company-level goal (status: active)
-3. Creates project with workspace (cwd → company dir, repo URL if provided)
+3. Creates project with workspace (cwd → `companies/<Name>/projects/<ProjectName>/`, repo URL if provided)
 4. Creates agents with per-role adapter config (`model`, `effort`, etc. from `role.json`)
 5. Creates initial issues linked to goal and project
+6. Optionally starts CEO heartbeat (`--start`)
 
 ## License
 
