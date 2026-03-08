@@ -1,17 +1,40 @@
-# Clipper
-
-**Company as code.** Bootstrap AI agent teams from modular templates.
-
-[![npm version](https://img.shields.io/npm/v/@yesterday-ai/paperclipper)](https://www.npmjs.com/package/@yesterday-ai/paperclipper)
-[![CI](https://github.com/Yesterday-AI/paperclipper/actions/workflows/ci.yml/badge.svg)](https://github.com/Yesterday-AI/paperclipper/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
+<p align="center">
+  <h1 align="center">Clipper</h1>
+  <p align="center">
+    <strong>Bootstrap AI agent teams from modular templates.</strong>
+  </p>
+  <p align="center">
+    <a href="https://www.npmjs.com/package/@yesterday-ai/paperclipper"><img src="https://img.shields.io/npm/v/@yesterday-ai/paperclipper?color=cb3837&label=npm" alt="npm version"></a>
+    <a href="https://github.com/Yesterday-AI/paperclipper/actions/workflows/ci.yml"><img src="https://github.com/Yesterday-AI/paperclipper/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
+    <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node.js"></a>
+  </p>
+</p>
 
 ---
 
 Clipper is a CLI and template system for [Paperclip](https://github.com/paperclipai/paperclip) — the control plane for AI-agent companies. It assembles ready-to-run company workspaces by combining a base org (CEO + Engineer) with composable modules and optional specialist roles.
 
-Capabilities adapt gracefully: adding a Product Owner makes it the primary owner of backlog management, with the CEO as automatic fallback. Adding a UX Researcher makes them the primary market analyst. The system works with just two roles and gets better as you add more.
+> **Gracefully optimistic:** capabilities extend, they don't require. The system works with just two roles and gets better as you add more. Adding a Product Owner shifts backlog management away from the CEO automatically. Adding a UX Researcher makes them the primary market analyst. No config changes needed.
+
+<br>
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Install](#install)
+- [Usage](#usage)
+- [What You Get](#what-you-get)
+- [Architecture](#gracefully-optimistic-architecture)
+- [Presets](#presets)
+- [Modules](#modules)
+- [Roles](#roles)
+- [After Clipper](#after-clipper)
+- [Extending](#extending)
+- [How It Works](#how-it-works)
+- [Contributing](#contributing)
+
+<br>
 
 ## Quick Start
 
@@ -19,22 +42,26 @@ Capabilities adapt gracefully: adding a Product Owner makes it the primary owner
 npx @yesterday-ai/paperclipper
 ```
 
-That's it. The interactive wizard handles the rest. Add `--api` to auto-provision in your local [Paperclip](https://github.com/paperclipai/paperclip) instance.
+That's it. The interactive wizard handles the rest. Add `--api` to auto-provision in your local Paperclip instance.
+
+<br>
 
 ## Install
 
 ```sh
-npx @yesterday-ai/paperclipper           # run directly
+npx @yesterday-ai/paperclipper           # run directly (no install)
 npm i -g @yesterday-ai/paperclipper      # or install globally → clipper
 ```
 
-Requires Node.js 20+.
+Requires **Node.js 20+**.
+
+<br>
 
 ## Usage
 
 The interactive wizard walks through these steps:
 
-```text
+```
 $ clipper --api
 
   ╭──────────────╮
@@ -56,312 +83,98 @@ $ clipper --api
     full — Full company setup with everything...
     custom — Pick modules manually
 
-  Select modules: (↑↓ navigate · space toggle · enter confirm)
-  ❯ ◉ github-repo
-    ◉ roadmap-to-issues
-    ◉ auto-assign
-    ◉ stall-detection
-    ○ pr-review
-
-  Capability resolution:
-    roadmap-to-issues: ceo
-    auto-assign: ceo
-
-  Summary:
-    Company:  Acme Corp
-    Goal:     Build the best widgets in the world
-    Project:  Acme Corp
-    Repo:     https://github.com/acme/widgets
-    Modules:  github-repo, roadmap-to-issues, auto-assign, stall-detection
-    Roles:    ceo, engineer
-    Output:   ./companies/AcmeCorp
-    API:      enabled (will create company, goal, project, agents, issues)
-
-  Create? [Y/n]:
+  ✓ Company "Acme Corp" created
+  ✓ Goal created
+  ✓ Project created (workspace: companies/AcmeCorp/projects/AcmeCorp)
+  ✓ CEO agent created
+  ✓ Engineer agent created
+  ✓ 4 issues created
+  ✓ CEO heartbeat started
 ```
 
 ### Options
 
-```sh
-clipper                                # interactive wizard, output to ./companies/
-clipper --output /path/to/companies    # custom output directory
-clipper --api                          # also provision via Paperclip API
-clipper --api --start                  # provision and start CEO heartbeat
-clipper --api --model claude-opus-4-6  # set default model for all agents
-clipper --api-url http://host:3100     # custom API URL (implies --api)
-```
-
 | Flag | Description | Default |
-| ---- | ----------- | ------- |
+| :--- | :---------- | :------ |
 | `--output <dir>` | Output directory for company workspaces | `./companies/` |
-| `--api` | Provision company, goal, project, agents, and issues via Paperclip API after file assembly | off |
+| `--api` | Provision via Paperclip API after file assembly | off |
 | `--api-url <url>` | Paperclip API URL (implies `--api`) | `http://localhost:3100` |
-| `--model <model>` | Default LLM model for all agents (overridden by `role.json` per-role config) | adapter default |
+| `--model <model>` | Default LLM model for all agents | adapter default |
 | `--start` | Start CEO heartbeat after provisioning (implies `--api`) | off |
 
-The company directory name is PascalCase: "Black Mesa" → `companies/BlackMesa/`.
+> Company directories use PascalCase: `"Black Mesa"` becomes `companies/BlackMesa/`
+
+<br>
 
 ## What You Get
 
-```text
+```
 companies/AcmeCorp/
-├── BOOTSTRAP.md                    # Setup guide: goal, project, agents, tasks
+├── BOOTSTRAP.md              # Setup guide (goal, project, agents, tasks)
 ├── agents/
 │   ├── ceo/
-│   │   ├── AGENTS.md               # Identity, references, skill list
-│   │   ├── SOUL.md                 # Persona and voice
-│   │   ├── HEARTBEAT.md            # Execution checklist
-│   │   ├── TOOLS.md                # Tool inventory
-│   │   └── skills/                 # Assigned by capability resolution
+│   │   ├── AGENTS.md         # Identity + skill references
+│   │   ├── SOUL.md           # Persona and voice
+│   │   ├── HEARTBEAT.md      # Execution checklist
+│   │   ├── TOOLS.md          # Tool inventory
+│   │   └── skills/           # Assigned by capability resolution
 │   ├── engineer/
-│   │   ├── AGENTS.md
-│   │   ├── SOUL.md, HEARTBEAT.md, TOOLS.md
-│   │   └── skills/
-│   ├── product-owner/              (if role selected)
 │   │   └── ...
-│   ├── code-reviewer/              (if role selected)
-│   │   └── ...
-│   ├── ui-designer/                (if role selected)
-│   │   └── ...
-│   └── ux-researcher/              (if role selected)
-│       └── ...
-├── projects/                       # Project workspace(s)
-│   └── <ProjectName>/              # cwd for agent heartbeats
-└── docs/                           # Shared workflows from modules
+│   ├── product-owner/        # ← if role selected
+│   ├── code-reviewer/        # ← if role selected
+│   ├── ui-designer/          # ← if role selected
+│   └── ux-researcher/        # ← if role selected
+├── projects/
+│   └── AcmeCorp/             # Agent workspace (cwd)
+└── docs/                     # Shared workflows from modules
 ```
 
-`BOOTSTRAP.md` contains everything needed to set up the company in the Paperclip UI — goal, project with workspace and repo, agent paths, and initial tasks. With `--api`, all of this is provisioned automatically.
+With `--api`, everything is provisioned automatically. Without it, `BOOTSTRAP.md` has step-by-step instructions for manual setup.
 
-Files are read live by Paperclip agents — edit anything on disk and it takes effect on the next heartbeat.
+> Files are read live by Paperclip agents — edit anything on disk and it takes effect on the next heartbeat.
+
+<br>
 
 ## Gracefully Optimistic Architecture
 
-Capabilities extend, they don't require. The system works with just CEO + Engineer, and gets better as you add specialist roles:
+Capabilities extend, they don't require. Start with CEO + Engineer, add specialists as needed:
 
 | Capability | Primary Owner | Fallback | Module |
-| ---------- | ------------- | -------- | ------ |
-| market-analysis | UX Researcher → Product Owner | CEO | market-analysis |
-| hiring-review | Product Owner | CEO | hiring-review |
-| roadmap-to-issues | Product Owner | CEO | roadmap-to-issues |
-| auto-assign | Product Owner | CEO | auto-assign |
-| tech-stack | Engineer | CEO | tech-stack |
-| architecture-plan | Engineer | CEO | architecture-plan |
-| design-system | UI Designer | Engineer | architecture-plan |
-| pr-review | Activates with Code Reviewer or Product Owner | — | pr-review |
-| stall-detection | CEO (always) | — | stall-detection |
-| vision-workshop | CEO (always) | — | vision-workshop |
+| :--------- | :------------ | :------- | :----- |
+| `market-analysis` | UX Researcher &rarr; Product Owner | CEO | market-analysis |
+| `hiring-review` | Product Owner | CEO | hiring-review |
+| `roadmap-to-issues` | Product Owner | CEO | roadmap-to-issues |
+| `auto-assign` | Product Owner | CEO | auto-assign |
+| `tech-stack` | Engineer | CEO | tech-stack |
+| `architecture-plan` | Engineer | CEO | architecture-plan |
+| `design-system` | UI Designer | Engineer | architecture-plan |
+| `pr-review` | Code Reviewer / Product Owner | — | pr-review |
+| `stall-detection` | CEO (always) | — | stall-detection |
+| `vision-workshop` | CEO (always) | — | vision-workshop |
 
-Primary owners get the full skill. Fallback owners get a safety-net variant that only activates when the primary is absent or stalled.
+**How it works:** Primary owners get the full skill. Fallback owners get a safety-net variant that only activates when the primary is absent or stalled.
 
-**Example**: With just CEO + Engineer, the CEO handles market analysis, hiring review, and backlog management alongside strategy. Add a Product Owner and those responsibilities shift automatically — the CEO's skills downgrade to fallback-only safety nets.
+> **Example:** With just CEO + Engineer, the CEO handles market analysis, hiring review, and backlog management alongside strategy. Add a Product Owner and those responsibilities shift automatically — the CEO's skills downgrade to fallback-only safety nets.
+
+<br>
 
 ## Presets
 
-| Preset | Roles | Modules | Best for |
-| ------ | ----- | ------- | -------- |
-| **fast** | CEO, Engineer | github-repo, roadmap-to-issues, auto-assign, stall-detection | Solo engineer, prototypes, MVPs |
-| **quality** | CEO, Engineer, Product Owner, Code Reviewer | github-repo, pr-review, roadmap-to-issues, auto-assign, stall-detection | Teams, production systems |
-| **rad** | CEO, Engineer | tech-stack, hiring-review, github-repo, roadmap-to-issues, auto-assign, stall-detection | Rapid prototyping, iterate fast, formalize later |
-| **startup** | CEO, Engineer | vision-workshop, market-analysis, hiring-review, tech-stack, architecture-plan, github-repo, roadmap-to-issues, auto-assign, stall-detection | Strategy-first bootstrapping, grow the team organically |
-| **research** | CEO, Engineer | vision-workshop, market-analysis, tech-stack, hiring-review | Research and planning phase — no code, no repo |
-| **full** | CEO, Engineer, Product Owner, Code Reviewer | All modules | Serious projects with full planning + quality engineering |
+| Preset | Modules | Best for |
+| :----- | :------ | :------- |
+| **`fast`** | github-repo, roadmap-to-issues, auto-assign, stall-detection | Solo engineer, prototypes, MVPs |
+| **`quality`** | + pr-review, + Product Owner, + Code Reviewer | Teams, production systems |
+| **`rad`** | + tech-stack, + hiring-review | Rapid prototyping, formalize later |
+| **`startup`** | + vision, market, hiring, tech, architecture | Strategy-first, grow organically |
+| **`research`** | vision, market, tech, hiring (no repo/code) | Planning phase only |
+| **`full`** | All modules + Product Owner + Code Reviewer | Full planning + quality engineering |
 
-> **fast** is designed for a single engineer. Multiple engineers committing to main without review will cause conflicts.
+> **`fast`** is for a single engineer — multiple engineers without review will cause conflicts.
 >
-> **research** has no GitHub repo or code workflow. Add `github-repo` and `roadmap-to-issues` when ready to build.
+> **`research`** has no code workflow. Add `github-repo` and `roadmap-to-issues` when ready to build.
 
-## Modules
-
-### Strategy & Planning
-
-| Module | What it does | Kickoff task | Doc template |
-| ------ | ------------ | ------------ | ------------ |
-| **vision-workshop** | Define vision, success metrics, strategic milestones | CEO defines vision | `vision-template.md` |
-| **market-analysis** | Research market, competitors, positioning | Primary owner conducts analysis | `market-analysis-template.md` |
-| **hiring-review** | Evaluate team gaps, propose hires via board approval | Primary owner reviews team | — |
-| **tech-stack** | Evaluate and document technology choices | Primary owner evaluates stack | `tech-stack-template.md` |
-| **architecture-plan** | Design system architecture + design system (with UI Designer) | Engineer designs architecture; Designer defines design system | `architecture-template.md`, `design-system-template.md` |
-
-### Engineering Workflow
-
-| Module | What it does | Kickoff task | Doc template |
-| ------ | ------------ | ------------ | ------------ |
-| **github-repo** | Git workflow and commit conventions | Engineer initializes repo | `git-workflow.md` |
-| **pr-review** | PR-based review (activates with code-reviewer or product-owner) | Engineer sets up branch protection | `pr-conventions.md` |
-| **roadmap-to-issues** | Auto-generates issues from goals when backlog runs low | Primary owner creates initial backlog | — |
-| **auto-assign** | Assigns unassigned issues to idle agents | — | — |
-| **stall-detection** | Detects stuck handovers and nudges or escalates | — | — |
-
-## Template Catalogue
-
-### Roles
-
-Every company starts with **CEO** and **Engineer** (base roles). These optional roles extend the team:
-
-#### Product Owner
-
-| | |
-|-|-|
-| **Paperclip role** | `pm` |
-| **Reports to** | CEO |
-| **Enhances** | Takes over roadmap-to-issues, auto-assign, hiring-review from CEO |
-| **Review** | Adds product-alignment review pass (with pr-review module) |
-
-The voice of the user. Owns the backlog pipeline, validates engineering output against goals, manages scope discipline.
-
-#### Code Reviewer
-
-| | |
-|-|-|
-| **Paperclip role** | `qa` |
-| **Reports to** | CEO |
-| **Enhances** | Enables pr-review module activation |
-
-Owns code quality. Reviews PRs for correctness, style, security, and test coverage. Never writes code — only reviews it.
-
-#### UI & Brand Designer
-
-| | |
-|-|-|
-| **Paperclip role** | `designer` |
-| **Reports to** | CEO |
-| **Enhances** | Takes over design-system from Engineer; contributes UI layer to architecture-plan |
-| **Review** | Adds design review pass (with pr-review module) |
-
-Owns visual identity, design systems, and brand consistency. Creates design specs that engineers implement. Outputs are design documents, not code.
-
-#### UX Researcher
-
-| | |
-|-|-|
-| **Paperclip role** | `researcher` |
-| **Reports to** | CEO |
-| **Enhances** | Takes over market-analysis from Product Owner/CEO; contributes user metrics to vision-workshop |
-| **Review** | Adds UX review pass (with pr-review module) |
-
-Owns user experience research, usability analysis, and journey mapping. Grounds design and product decisions in evidence-based user insights.
-
----
-
-### Modules
-
-#### vision-workshop
-
-Defines the strategic foundation. The CEO runs a vision workshop to refine the company goal into a vision statement, success metrics, and milestones.
-
-```
-Capability: none (CEO-only strategic task)
-Task:       "Define company vision, success metrics, and strategic milestones" → CEO
-Doc:        docs/vision-template.md
-```
-
-With UX Researcher: contributes user-centered metrics and journey mapping to the vision document.
-
-#### market-analysis
-
-Researches the target market, competitors, and positioning.
-
-```
-Capability: market-analysis
-  Owners:   ux-researcher → product-owner → ceo
-  Fallback: CEO creates a brief overview only if primary owner is absent
-Task:       "Conduct initial market analysis" → primary owner
-Doc:        docs/market-analysis-template.md
-```
-
-#### hiring-review
-
-Evaluates team composition against the goal and proposes hires through board approval.
-
-```
-Capability: hiring-review
-  Owners:   product-owner → ceo
-  Fallback: CEO proposes one urgent hire only if primary owner is absent
-Task:       "Evaluate team composition and propose new hires" → primary owner
-```
-
-#### tech-stack
-
-Evaluates technology options and documents decisions with rationale and trade-offs.
-
-```
-Capability: tech-stack
-  Owners:   engineer → ceo
-  Fallback: CEO makes pragmatic defaults, marks them provisional for engineer review
-Task:       "Evaluate and document technology choices" → primary owner
-Doc:        docs/tech-stack-template.md
-```
-
-#### architecture-plan
-
-Designs the system architecture. Requires `tech-stack`. Includes a **design-system** capability that activates when a UI Designer is present.
-
-```
-Capability: architecture-plan
-  Owners:   engineer → ceo
-  Fallback: CEO sketches a minimal outline for engineer review
-Task:       "Design initial system architecture" → primary owner
-Doc:        docs/architecture-template.md
-
-Capability: design-system
-  Owners:   ui-designer → engineer
-  Fallback: Engineer sets up sensible defaults (Tailwind-style)
-Task:       "Define design system and visual language" → primary owner
-Doc:        docs/design-system-template.md
-```
-
-With UI Designer: the designer owns the full design system and contributes the UI architecture layer. Without: the engineer sets up minimal defaults.
-
-#### github-repo
-
-Git workflow and commit conventions.
-
-```
-Task:       "Initialize GitHub repository" → engineer
-Doc:        docs/git-workflow.md
-```
-
-#### pr-review
-
-PR-based review workflow. Requires `github-repo`. Activates with `code-reviewer` or `product-owner`.
-
-```
-Task:       "Set up branch protection and PR requirements" → engineer
-Doc:        docs/pr-conventions.md
-```
-
-#### roadmap-to-issues
-
-Auto-generates issues from the roadmap when the backlog runs low.
-
-```
-Capability: roadmap-to-issues
-  Owners:   product-owner → ceo
-  Fallback: CEO creates 1-2 issues only when backlog is critically empty
-Task:       "Create roadmap and generate initial backlog" → primary owner
-```
-
-#### auto-assign
-
-Assigns unassigned issues to idle agents.
-
-```
-Capability: auto-assign
-  Owners:   product-owner → ceo
-  Fallback: CEO assigns only when agents are critically idle
-```
-
-#### stall-detection
-
-Detects issues stuck in `in_progress` or `in_review` with no recent activity. Nudges the assigned agent, escalates to the board if nudging doesn't help.
-
-```
-Capability: stall-detection (CEO-only)
-```
-
----
-
-### Preset Compositions
+<details>
+<summary><strong>Preset details</strong></summary>
 
 **fast** — Solo engineer, direct-to-main, automated backlog. No review, no planning phase.
 
@@ -375,6 +188,146 @@ Capability: stall-detection (CEO-only)
 
 **full** — Everything. Full strategic planning, quality engineering with PR review, team growth via hiring review. Product Owner and Code Reviewer included. Best for serious projects that need both strategy and engineering rigor.
 
+</details>
+
+<br>
+
+## Modules
+
+### Strategy & Planning
+
+| Module | What it does | Kickoff task |
+| :----- | :----------- | :----------- |
+| **`vision-workshop`** | Define vision, success metrics, strategic milestones | CEO defines vision |
+| **`market-analysis`** | Research market, competitors, positioning | Primary owner conducts analysis |
+| **`hiring-review`** | Evaluate team gaps, propose hires via board approval | Primary owner reviews team |
+| **`tech-stack`** | Evaluate and document technology choices | Primary owner evaluates stack |
+| **`architecture-plan`** | Design system architecture + design system | Engineer + Designer (if present) |
+
+### Engineering Workflow
+
+| Module | What it does | Kickoff task |
+| :----- | :----------- | :----------- |
+| **`github-repo`** | Git workflow and commit conventions | Engineer initializes repo |
+| **`pr-review`** | PR-based review workflow | Engineer sets up branch protection |
+| **`roadmap-to-issues`** | Auto-generate issues from goals when backlog runs low | Primary owner creates initial backlog |
+| **`auto-assign`** | Assign unassigned issues to idle agents | — |
+| **`stall-detection`** | Detect stuck handovers, nudge or escalate | — |
+
+<details>
+<summary><strong>Module details</strong></summary>
+
+#### vision-workshop
+
+Defines the strategic foundation. The CEO runs a vision workshop to refine the company goal into a vision statement, success metrics, and milestones.
+
+- **Capability:** none (CEO-only strategic task)
+- **Doc:** `docs/vision-template.md`
+- With UX Researcher: contributes user-centered metrics and journey mapping
+
+#### market-analysis
+
+Researches the target market, competitors, and positioning.
+
+- **Capability:** `market-analysis` — owners: `ux-researcher` &rarr; `product-owner` &rarr; `ceo`
+- **Fallback:** CEO creates a brief overview only
+- **Doc:** `docs/market-analysis-template.md`
+
+#### hiring-review
+
+Evaluates team composition against the goal and proposes hires through board approval.
+
+- **Capability:** `hiring-review` — owners: `product-owner` &rarr; `ceo`
+- **Fallback:** CEO proposes one urgent hire only
+
+#### tech-stack
+
+Evaluates technology options and documents decisions with rationale and trade-offs.
+
+- **Capability:** `tech-stack` — owners: `engineer` &rarr; `ceo`
+- **Fallback:** CEO makes pragmatic defaults, marks them provisional
+- **Doc:** `docs/tech-stack-template.md`
+
+#### architecture-plan
+
+Designs the system architecture. Requires `tech-stack`. Includes a `design-system` capability for UI Designers.
+
+- **Capability:** `architecture-plan` — owners: `engineer` &rarr; `ceo`
+- **Capability:** `design-system` — owners: `ui-designer` &rarr; `engineer`
+- **Docs:** `docs/architecture-template.md`, `docs/design-system-template.md`
+
+#### github-repo
+
+Git workflow and commit conventions.
+
+- **Task:** Engineer initializes repo
+- **Doc:** `docs/git-workflow.md`
+
+#### pr-review
+
+PR-based review workflow. Requires `github-repo`. Activates with `code-reviewer` or `product-owner`.
+
+- **Task:** Engineer sets up branch protection
+- **Doc:** `docs/pr-conventions.md`
+
+#### roadmap-to-issues
+
+Auto-generates issues from the roadmap when the backlog runs low.
+
+- **Capability:** `roadmap-to-issues` — owners: `product-owner` &rarr; `ceo`
+- **Fallback:** CEO creates 1-2 issues only when backlog is critically empty
+
+#### auto-assign
+
+Assigns unassigned issues to idle agents.
+
+- **Capability:** `auto-assign` — owners: `product-owner` &rarr; `ceo`
+- **Fallback:** CEO assigns only when agents are critically idle
+
+#### stall-detection
+
+Detects issues stuck in `in_progress` or `in_review` with no recent activity. Nudges the assigned agent, escalates to the board if nudging doesn't help.
+
+- **Capability:** CEO-only
+
+</details>
+
+<br>
+
+## Roles
+
+Every company starts with **CEO** and **Engineer** (base roles). These optional roles extend the team:
+
+| Role | Paperclip role | Reports to | Enhances |
+| :--- | :------------- | :--------- | :------- |
+| **Product Owner** | `pm` | CEO | Takes over roadmap, auto-assign, hiring-review from CEO |
+| **Code Reviewer** | `qa` | CEO | Enables pr-review activation |
+| **UI & Brand Designer** | `designer` | CEO | Takes over design-system from Engineer |
+| **UX Researcher** | `researcher` | CEO | Takes over market-analysis, contributes to vision |
+
+<details>
+<summary><strong>Role details</strong></summary>
+
+#### Product Owner
+
+The voice of the user. Owns the backlog pipeline, validates engineering output against goals, manages scope discipline. Adds product-alignment review pass with pr-review module.
+
+#### Code Reviewer
+
+Owns code quality. Reviews PRs for correctness, style, security, and test coverage. Never writes code — only reviews it.
+
+#### UI & Brand Designer
+
+Owns visual identity, design systems, and brand consistency. Creates design specs that engineers implement. Outputs are design documents, not code. Adds design review pass with pr-review module.
+
+#### UX Researcher
+
+Owns user experience research, usability analysis, and journey mapping. Grounds design and product decisions in evidence-based user insights. Adds UX review pass with pr-review module.
+
+</details>
+
+<br>
+
 ## After Clipper
 
 ### With `--api` (recommended)
@@ -382,34 +335,35 @@ Capability: stall-detection (CEO-only)
 Clipper provisions everything in the local Paperclip instance automatically:
 
 1. **Company** — created with the name you entered
-2. **Goal** — company-level goal with your title and description, set to `active`
-3. **Project** — with a workspace pointing to `companies/<Name>/projects/<ProjectName>/` (and GitHub repo if provided)
-4. **Agents** — one per role, each with correct absolute `cwd`, `instructionsFilePath`, model, and adapter config from `role.json`
-5. **Issues** — initial tasks from modules, linked to the goal and project
+2. **Goal** — company-level goal, set to `active`
+3. **Project** — workspace pointing to `companies/<Name>/projects/<ProjectName>/`
+4. **Agents** — one per role, with `cwd`, `instructionsFilePath`, model, and adapter config
+5. **Issues** — initial tasks from modules, linked to goal and project
 6. **CEO heartbeat** — optionally started with `--start`
-
-After provisioning, the CLI shows a detailed summary of every created resource with IDs.
 
 ### Without `--api`
 
-Follow the `BOOTSTRAP.md` file generated in the company directory. It lists every resource to create manually in the Paperclip UI: company, goal, project with workspace, agents with paths, and initial issues.
+Follow the `BOOTSTRAP.md` file generated in the company directory. It lists every resource to create manually in the Paperclip UI.
+
+<br>
 
 ## Extending
 
 ### Add a module
 
-```text
+```
 templates/modules/<name>/
-├── module.json                  # Name, capabilities, activatesWithRoles, tasks
+├── module.json                  # Name, capabilities, tasks, dependencies
 ├── skills/                      # Shared skills (used by any primary owner)
-│   └── <skill>.md               # One file per capability
+│   └── <skill>.md
 ├── agents/<role>/skills/        # Role-specific overrides and fallbacks
-│   ├── <skill>.md               # Override: replaces shared skill for this role
-│   └── <skill>.fallback.md      # Fallback: safety-net variant for non-primary owners
+│   ├── <skill>.md               # Override (replaces shared for this role)
+│   └── <skill>.fallback.md      # Fallback (safety-net for non-primary)
 └── docs/                        # Shared docs (→ docs/)
 ```
 
-#### module.json
+<details>
+<summary><strong>module.json schema</strong></summary>
 
 ```json
 {
@@ -433,54 +387,57 @@ templates/modules/<name>/
 }
 ```
 
-- `requires` — other modules that must be selected (no runtime enforcement yet)
-- `activatesWithRoles` — module only applies if at least one of these roles is present
-- `capabilities[].owners` — priority order; first present role gets the primary skill, others get fallback
-- `capabilities[].fallbackSkill` — filename (without .md) of the fallback variant
-- `tasks[].assignTo` — a role name (`"engineer"`) or `"capability:<skill>"` to auto-resolve to the primary owner
+| Field | Description |
+| :---- | :---------- |
+| `requires` | Other modules that must be selected |
+| `activatesWithRoles` | Module only applies if one of these roles is present |
+| `capabilities[].owners` | Priority order — first present role gets the primary skill |
+| `capabilities[].fallbackSkill` | Filename (without `.md`) of the fallback variant |
+| `tasks[].assignTo` | A role name or `"capability:<skill>"` to auto-resolve |
 
-#### Skill resolution
+</details>
 
-When assembling a capability's primary skill for a role, the system checks in order:
+<details>
+<summary><strong>Skill resolution</strong></summary>
 
-1. **Role-specific override**: `agents/<role>/skills/<skill>.md`
-2. **Shared skill**: `skills/<skill>.md`
+When assembling a capability's primary skill, the system checks in order:
 
-The first match wins. This means:
+1. **Role-specific override:** `agents/<role>/skills/<skill>.md`
+2. **Shared skill:** `skills/<skill>.md`
 
-- **Most capabilities only need a shared `skills/<skill>.md`** — the same instructions work for any primary owner (Product Owner, CEO, UX Researcher, etc.)
-- **Role-specific overrides** are only needed when a role brings a genuinely different approach (e.g., UX Researcher does user-focused market analysis vs the generic version)
-- **Fallback variants** (`<skill>.fallback.md`) are always role-specific because they describe reduced-scope behavior for a specific agent
+First match wins. Most capabilities only need a shared skill. Role-specific overrides exist only when a role brings a genuinely different approach. Fallback variants are always role-specific.
 
-```text
+```
 Example: market-analysis module
 ├── skills/
-│   └── market-analysis.md                           # Shared: any primary owner uses this
+│   └── market-analysis.md                    # Shared: any primary owner
 ├── agents/
 │   ├── ux-researcher/skills/
-│   │   └── market-analysis.md                       # Override: user-focused deep dive
+│   │   └── market-analysis.md                # Override: user-focused
 │   └── ceo/skills/
-│       └── market-analysis.fallback.md              # Fallback: brief overview only
+│       └── market-analysis.fallback.md       # Fallback: brief overview
 ```
 
-In this example:
-- If **UX Researcher** is present → gets their role-specific override (user-focused)
-- If **Product Owner** is primary (no UX Researcher) → gets the shared skill
-- If **CEO** is primary (no PO, no UXR) → gets the shared skill
-- **CEO** as fallback (when someone else is primary) → gets the fallback variant
+- **UX Researcher** present &rarr; gets role-specific override (user-focused)
+- **Product Owner** primary &rarr; gets shared skill
+- **CEO** primary &rarr; gets shared skill
+- **CEO** as fallback &rarr; gets fallback variant
+
+</details>
 
 ### Add a role
 
-```text
+```
 templates/roles/<name>/
-├── role.json                    # Name, title, description, reportsTo, enhances, adapter
+├── role.json        # Name, title, paperclipRole, reportsTo, adapter
 ├── AGENTS.md
 ├── SOUL.md
 ├── HEARTBEAT.md
 └── TOOLS.md
 ```
 
-#### role.json
+<details>
+<summary><strong>role.json schema</strong></summary>
 
 ```json
 {
@@ -491,14 +448,17 @@ templates/roles/<name>/
   "reportsTo": "ceo",
   "enhances": ["Takes over X from CEO"],
   "adapter": {
-    "model": "claude-sonnet-4-6",
-    "effort": "medium"
+    "model": "claude-sonnet-4-6"
   }
 }
 ```
 
-- `paperclipRole` — maps to a Paperclip `AGENT_ROLE` enum: `ceo`, `engineer`, `pm`, `qa`, `designer`, `cto`, `cmo`, `cfo`, `devops`, `researcher`, `general`
-- `adapter` — passed directly to `adapterConfig` during API provisioning. Supports any field the adapter accepts: `model`, `effort`, `maxTurnsPerRun`, etc. The `--model` CLI flag is used as fallback when `adapter.model` is not set.
+| Field | Description |
+| :---- | :---------- |
+| `paperclipRole` | Paperclip enum: `ceo`, `engineer`, `pm`, `qa`, `designer`, `cto`, `cmo`, `cfo`, `devops`, `researcher`, `general` |
+| `adapter` | Passed to `adapterConfig` during provisioning. `--model` CLI flag is fallback. |
+
+</details>
 
 ### Add a preset
 
@@ -513,30 +473,31 @@ templates/roles/<name>/
 }
 ```
 
+<br>
+
 ## How It Works
 
-The wizard collects: company name, goal, project (name + repo), preset, modules, and roles.
+```
+┌─────────────┐     ┌──────────────┐     ┌──────────────────┐
+│   Wizard    │────▶│   Assembly   │────▶│   Provisioning   │
+│  (prompts)  │     │  (files)     │     │   (API, --api)   │
+└─────────────┘     └──────────────┘     └──────────────────┘
+```
 
 **Assembly** (always runs):
 
 1. Copies base role files (CEO, Engineer) into `agents/`
 2. Copies selected extra roles into `agents/`
-3. For each module:
-   - Checks `activatesWithRoles` — skips if required roles aren't present
-   - Resolves capability ownership based on present roles
-   - Primary owner gets the full skill; fallback owners get the safety-net variant
-   - Copies shared docs into `docs/`
-   - Appends skill and doc references to each AGENTS.md
+3. For each module: resolves capability ownership, installs skills, copies docs
 4. Generates `BOOTSTRAP.md` with goal, project, agent paths, and initial tasks
 
 **Provisioning** (with `--api`):
 
-1. Creates company in Paperclip
-2. Creates company-level goal (status: active)
-3. Creates project with workspace (cwd → `companies/<Name>/projects/<ProjectName>/`, repo URL if provided)
-4. Creates agents with per-role adapter config (`model`, `effort`, etc. from `role.json`)
-5. Creates initial issues linked to goal and project
-6. Optionally starts CEO heartbeat (`--start`)
+1. Creates company &rarr; goal &rarr; project (with workspace) &rarr; agents &rarr; issues
+2. Wires `reportsTo` hierarchy (CEO first, then other agents)
+3. Optionally starts CEO heartbeat (`--start`)
+
+<br>
 
 ## Contributing
 
@@ -544,4 +505,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 ## License
 
-[MIT](LICENSE) - Yesterday
+[MIT](LICENSE) &mdash; [Yesterday](https://yesterday.ai)

@@ -9,10 +9,9 @@ Clipper is a company-as-code bootstrapping CLI for the Paperclip AI agent platfo
 ## Commands
 
 ```bash
-npm run build          # esbuild: src/cli.jsx → dist/cli.mjs (single ESM bundle)
-npm run dev            # Run source directly (needs --experimental-strip-types)
-npm test               # node --test src/logic/*.test.js
-node dist/cli.mjs      # Run built CLI
+npm run build       # esbuild: src/cli.jsx → dist/cli.mjs (single ESM bundle)
+npm test            # node --test src/logic/*.test.js
+node dist/cli.mjs   # Run built CLI
 ```
 
 ## Architecture

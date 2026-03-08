@@ -30,40 +30,53 @@ Every company starts functional and gets better as you add roles. No capability 
 ## Design Principles
 
 - **Files, not config servers** — Company structure is markdown files on disk. Agents read them fresh every heartbeat. Edit a file, behavior changes next cycle.
-- **Zero dependencies** — The CLI is a single Node.js script with no npm dependencies. Runs anywhere Node 18+ exists.
 - **Composable, not monolithic** — Modules are independent building blocks. Presets are just curated module combinations. Everything can be mixed, matched, and extended.
 - **Opinionated defaults, easy overrides** — Templates encode best practices but every file is editable after generation. Clipper gets you started; you own the result.
 - **Capability-based, not identity-based** — The system resolves "what can this company do?" based on present roles, not "which template was selected?" Roles declare capabilities, modules declare ownership chains, the assembly resolves at build time.
 - **Primary/fallback ownership** — Every capability has an ownership chain. The most qualified present role owns it; less specialized roles serve as safety nets.
+- **Shared skills, role-specific overrides** — Primary skills live in a shared `skills/` folder unless a role brings a genuinely different approach. Fallbacks are always role-specific.
 
 ## Architecture
 
 ```text
 clipper/
-├── create-company.mjs          # The CLI — interactive prompts → assembled workspace
+├── src/
+│   ├── cli.jsx                 # Entry point, flag parsing, renders <App>
+│   ├── app.jsx                 # Wizard state machine (NAME → ... → DONE)
+│   ├── components/             # One Ink component per wizard step
+│   ├── logic/                  # Pure functions (assembly, resolution, loading)
+│   └── api/                    # Paperclip API client + provisioning
 ├── templates/
 │   ├── base/                   # Always-present roles (ceo, engineer)
-│   ├── roles/                  # Optional roles (product-owner, code-reviewer)
-│   ├── modules/                # Composable capabilities
+│   ├── roles/                  # Optional roles (product-owner, code-reviewer, ui-designer, ux-researcher)
+│   ├── modules/                # Composable capabilities (10 modules)
+│   │   ├── vision-workshop/    # Strategic foundation
+│   │   ├── market-analysis/    # Market research
+│   │   ├── hiring-review/      # Team gap analysis
+│   │   ├── tech-stack/         # Technology evaluation
+│   │   ├── architecture-plan/  # System + design system architecture
 │   │   ├── github-repo/        # Git workflow
 │   │   ├── pr-review/          # PR-based code review
-│   │   ├── roadmap-to-issues/  # Backlog generation from goals
-│   │   ├── auto-assign/        # Idle agent → unassigned issue matching
+│   │   ├── roadmap-to-issues/  # Backlog generation
+│   │   ├── auto-assign/        # Idle agent → issue matching
 │   │   └── stall-detection/    # Stuck handover detection
-│   └── presets/                # Curated combinations (fast, quality)
+│   └── presets/                # Curated combinations (fast, quality, rad, startup, research, full)
+├── dist/cli.mjs                # Built CLI (esbuild bundle)
+└── esbuild.config.mjs          # Build config
 ```
 
 Each module contains:
-- `module.json` — Capability ownership chains, activation rules, initial tasks
-- `agents/<role>/skills/` — Primary and fallback skill variants
+- `module.json` — Capability ownership chains, activation rules, initial tasks, dependencies
+- `skills/<skill>.md` — Shared primary skill (used by any primary owner)
+- `agents/<role>/skills/` — Role-specific overrides and fallback variants
 - `docs/` — Shared documentation injected into all agents
 
 ## Where This Is Going
 
-- **API provisioning** — Create the company and agents directly via the Paperclip API instead of manual UI setup
-- **More modules** — Testing workflows, deployment pipelines, documentation generation, sprint cycles
-- **More roles** — CTO, Designer, DevOps, Researcher — each extending capabilities gracefully
-- **Community templates** — Third-party modules and presets shared via npm or git
-- **Goal templates** — Pre-built company goals with matching roadmaps and initial issue sets
-- **Runtime capability awareness** — Agents know at runtime which capabilities their company has, enabling smarter handover decisions (currently resolved at build time only)
-- **Formal capability declarations per role** — Roles declare machine-readable capabilities (not just human-readable `enhances[]` text), enabling automatic module activation and dependency resolution
+See [ROADMAP.md](ROADMAP.md) for the full backlog. Key areas:
+
+- **AI wizard mode** — Describe the company in natural language, let an LLM select the best configuration
+- **More modules** — user-testing, brand-identity, ci-cd, monitoring
+- **More roles** — CTO, CMO, CFO, DevOps, QA
+- **Excalidraw MCP integration** — Visual diagram generation as an agent skill
+- **Runtime capability awareness** — Agents know at runtime which capabilities their company has
