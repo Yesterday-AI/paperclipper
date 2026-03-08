@@ -94,6 +94,22 @@ $ clipper --api
 
 ### Options
 
+#### Company options
+
+| Flag | Description | Default |
+| :--- | :---------- | :------ |
+| `--name <name>` | Company name | _(wizard prompt)_ |
+| `--goal <title>` | Company goal title | _(wizard prompt)_ |
+| `--goal-description <desc>` | Goal description | _(wizard prompt)_ |
+| `--project <name>` | Project name | company name |
+| `--project-description <desc>` | Project description | _(wizard prompt)_ |
+| `--repo <url>` | GitHub repository URL | _(wizard prompt)_ |
+| `--preset <name>` | Preset: `fast`, `quality`, `rad`, `startup`, `research`, `full` | _(wizard prompt)_ |
+| `--modules <a,b,c>` | Comma-separated module names (merged with preset) | _(wizard prompt)_ |
+| `--roles <a,b>` | Comma-separated extra role names (merged with preset) | _(wizard prompt)_ |
+
+#### Infrastructure options
+
 | Flag | Description | Default |
 | :--- | :---------- | :------ |
 | `--output <dir>` | Output directory for company workspaces | `./companies/` |
@@ -103,6 +119,29 @@ $ clipper --api
 | `--start` | Start CEO heartbeat after provisioning (implies `--api`) | off |
 
 > Company directories use PascalCase: `"Black Mesa"` becomes `companies/BlackMesa/`
+
+### Non-interactive mode
+
+Pass `--name` and `--preset` to skip the wizard entirely. No TTY required.
+
+```sh
+# Minimal — assemble files only
+clipper --name "Acme" --preset fast
+
+# Full provisioning
+clipper --name "Acme" --goal "Build widgets" --preset startup --api --start
+
+# Custom composition
+clipper --name "Acme" --preset fast --roles product-owner --modules pr-review
+
+# Preset with overrides
+clipper --name "Acme" --preset custom --modules github-repo,auto-assign,stall-detection
+
+# In a CI/CD pipeline or script
+clipper --name "$COMPANY" --preset "$PRESET" --api --api-url "$API_URL" --start
+```
+
+`--modules` and `--roles` are additive — they merge with whatever the preset includes.
 
 <br>
 

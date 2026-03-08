@@ -34,7 +34,24 @@ const STEPS = {
   ERROR: "error",
 };
 
-export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model, startCeo }) {
+export default function App({
+  outputDir,
+  templatesDir,
+  apiEnabled,
+  apiBaseUrl,
+  model,
+  startCeo,
+  // Pre-filled values from CLI flags (partial non-interactive)
+  initialName = null,
+  initialGoal = null,
+  initialGoalDescription = null,
+  initialProjectName = null,
+  initialProjectDescription = null,
+  initialRepo = null,
+  initialPreset = null,
+  initialModules = [],
+  initialRoles = [],
+}) {
   const { exit } = useApp();
 
   const [step, setStep] = useState(STEPS.LOADING);
@@ -45,10 +62,17 @@ export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, m
   const [modules, setModules] = useState([]);
   const [availableRoles, setAvailableRoles] = useState([]);
 
-  // User selections
-  const [companyName, setCompanyName] = useState("");
-  const [goal, setGoal] = useState({ title: "", description: null });
-  const [project, setProject] = useState({ name: "", description: null, repoUrl: null });
+  // User selections (pre-filled from flags where available)
+  const [companyName, setCompanyName] = useState(initialName || "");
+  const [goal, setGoal] = useState({
+    title: initialGoal || "",
+    description: initialGoalDescription || null,
+  });
+  const [project, setProject] = useState({
+    name: initialProjectName || "",
+    description: initialProjectDescription || null,
+    repoUrl: initialRepo || null,
+  });
   const [baseName, setBaseName] = useState("base");
   const [presetName, setPresetName] = useState("");
   const [selectedModules, setSelectedModules] = useState([]);
@@ -59,6 +83,32 @@ export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, m
   // Results
   const [assemblyResult, setAssemblyResult] = useState(null);
   const [provisionResult, setProvisionResult] = useState(null);
+
+  // Determine the first step that needs user input
+  function resolveFirstStep(loadedPresets) {
+    if (!companyName) return STEPS.NAME;
+    if (!goal.title && !initialGoal) return STEPS.GOAL;
+    // If goal was set via flag, project name defaults to company name
+    if (!project.name && !initialProjectName) {
+      setProject((p) => ({ ...p, name: companyName }));
+    }
+    if (initialPreset) {
+      // Apply preset immediately
+      const preset = loadedPresets.find((p) => p.name === initialPreset);
+      if (preset) {
+        setBaseName(preset.base || "base");
+        const mods = [...new Set([...(preset.modules || []), ...initialModules])];
+        const roles = [...new Set([...(preset.roles || []), ...initialRoles])];
+        setPresetName(preset.name);
+        setPreselectedModules(mods);
+        setSelectedModules(mods);
+        setPreselectedRoles(roles);
+        setSelectedRoles(roles);
+        return STEPS.SUMMARY;
+      }
+    }
+    return STEPS.PRESET;
+  }
 
   // Load template data on mount
   useEffect(() => {
@@ -71,7 +121,7 @@ export default function App({ outputDir, templatesDir, apiEnabled, apiBaseUrl, m
         setPresets(p);
         setModules(m);
         setAvailableRoles(r);
-        setStep(STEPS.NAME);
+        setStep(resolveFirstStep(p));
       })
       .catch((err) => {
         setError(err.message);

@@ -40488,16 +40488,40 @@ var STEPS = {
   DONE: "done",
   ERROR: "error"
 };
-function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model, startCeo }) {
+function App2({
+  outputDir,
+  templatesDir,
+  apiEnabled,
+  apiBaseUrl,
+  model,
+  startCeo,
+  // Pre-filled values from CLI flags (partial non-interactive)
+  initialName = null,
+  initialGoal = null,
+  initialGoalDescription = null,
+  initialProjectName = null,
+  initialProjectDescription = null,
+  initialRepo = null,
+  initialPreset = null,
+  initialModules = [],
+  initialRoles = []
+}) {
   const { exit } = use_app_default();
   const [step, setStep] = (0, import_react46.useState)(STEPS.LOADING);
   const [error, setError] = (0, import_react46.useState)(null);
   const [presets, setPresets] = (0, import_react46.useState)([]);
   const [modules, setModules] = (0, import_react46.useState)([]);
   const [availableRoles, setAvailableRoles] = (0, import_react46.useState)([]);
-  const [companyName, setCompanyName] = (0, import_react46.useState)("");
-  const [goal, setGoal] = (0, import_react46.useState)({ title: "", description: null });
-  const [project, setProject] = (0, import_react46.useState)({ name: "", description: null, repoUrl: null });
+  const [companyName, setCompanyName] = (0, import_react46.useState)(initialName || "");
+  const [goal, setGoal] = (0, import_react46.useState)({
+    title: initialGoal || "",
+    description: initialGoalDescription || null
+  });
+  const [project, setProject] = (0, import_react46.useState)({
+    name: initialProjectName || "",
+    description: initialProjectDescription || null,
+    repoUrl: initialRepo || null
+  });
   const [baseName, setBaseName] = (0, import_react46.useState)("base");
   const [presetName, setPresetName] = (0, import_react46.useState)("");
   const [selectedModules, setSelectedModules] = (0, import_react46.useState)([]);
@@ -40506,6 +40530,28 @@ function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model, startCeo
   const [preselectedRoles, setPreselectedRoles] = (0, import_react46.useState)([]);
   const [assemblyResult, setAssemblyResult] = (0, import_react46.useState)(null);
   const [provisionResult, setProvisionResult] = (0, import_react46.useState)(null);
+  function resolveFirstStep(loadedPresets) {
+    if (!companyName) return STEPS.NAME;
+    if (!goal.title && !initialGoal) return STEPS.GOAL;
+    if (!project.name && !initialProjectName) {
+      setProject((p) => ({ ...p, name: companyName }));
+    }
+    if (initialPreset) {
+      const preset = loadedPresets.find((p) => p.name === initialPreset);
+      if (preset) {
+        setBaseName(preset.base || "base");
+        const mods = [.../* @__PURE__ */ new Set([...preset.modules || [], ...initialModules])];
+        const roles = [.../* @__PURE__ */ new Set([...preset.roles || [], ...initialRoles])];
+        setPresetName(preset.name);
+        setPreselectedModules(mods);
+        setSelectedModules(mods);
+        setPreselectedRoles(roles);
+        setSelectedRoles(roles);
+        return STEPS.SUMMARY;
+      }
+    }
+    return STEPS.PRESET;
+  }
   (0, import_react46.useEffect)(() => {
     Promise.all([
       loadPresets(templatesDir),
@@ -40515,7 +40561,7 @@ function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model, startCeo
       setPresets(p);
       setModules(m);
       setAvailableRoles(r);
-      setStep(STEPS.NAME);
+      setStep(resolveFirstStep(p));
     }).catch((err) => {
       setError(err.message);
       setStep(STEPS.ERROR);
@@ -40740,10 +40786,172 @@ function App2({ outputDir, templatesDir, apiEnabled, apiBaseUrl, model, startCeo
   ] });
 }
 
+// src/headless.js
+async function runHeadless(opts) {
+  const log = (msg) => console.log(msg);
+  const [presets, modules, allAvailableRoles] = await Promise.all([
+    loadPresets(opts.templatesDir),
+    loadModules(opts.templatesDir),
+    loadRoles(opts.templatesDir)
+  ]);
+  let baseName = "base";
+  let presetModules = [];
+  let presetRoles = [];
+  if (opts.preset && opts.preset !== "custom") {
+    const preset = presets.find((p) => p.name === opts.preset);
+    if (!preset) {
+      const names = presets.map((p) => p.name).join(", ");
+      console.error(`Error: unknown preset "${opts.preset}". Available: ${names}`);
+      process.exit(1);
+    }
+    baseName = preset.base || "base";
+    presetModules = preset.modules || [];
+    presetRoles = preset.roles || [];
+  }
+  const selectedModules = [.../* @__PURE__ */ new Set([...presetModules, ...opts.modules])];
+  const selectedRoles = [.../* @__PURE__ */ new Set([...presetRoles, ...opts.roles])];
+  const moduleNames = new Set(modules.map((m) => m.name));
+  for (const mod of selectedModules) {
+    if (!moduleNames.has(mod)) {
+      const names = [...moduleNames].join(", ");
+      console.error(`Error: unknown module "${mod}". Available: ${names}`);
+      process.exit(1);
+    }
+  }
+  const roleNames = new Set(allAvailableRoles.filter((r) => !r._base).map((r) => r.name));
+  for (const role of selectedRoles) {
+    if (!roleNames.has(role)) {
+      const names = [...roleNames].join(", ");
+      console.error(`Error: unknown role "${role}". Available: ${names}`);
+      process.exit(1);
+    }
+  }
+  const allRolesSet = buildAllRoles(["ceo", "engineer"], selectedRoles);
+  const capabilities = resolveCapabilities(modules, selectedModules, allRolesSet);
+  const rolesData = /* @__PURE__ */ new Map();
+  for (const r of allAvailableRoles) {
+    rolesData.set(r.name, r);
+  }
+  const project = {
+    name: opts.projectName || opts.name,
+    description: opts.projectDescription || null,
+    repoUrl: opts.repo || null
+  };
+  const goal = {
+    title: opts.goal || "",
+    description: opts.goalDescription || null
+  };
+  log("");
+  log(`  Company:  ${opts.name}`);
+  if (goal.title) log(`  Goal:     ${goal.title}`);
+  log(`  Project:  ${project.name}`);
+  if (project.repoUrl) log(`  Repo:     ${project.repoUrl}`);
+  log(`  Preset:   ${opts.preset || "custom"}`);
+  log(`  Modules:  ${selectedModules.join(", ") || "(none)"}`);
+  log(`  Roles:    ceo, engineer${selectedRoles.length ? ", " + selectedRoles.join(", ") : ""}`);
+  if (capabilities.length) {
+    log(`  Capabilities:`);
+    for (const cap of capabilities) {
+      log(`    ${cap.skill}: ${cap.primary}`);
+    }
+  }
+  log("");
+  log("Assembling workspace...");
+  const assemblyResult = await assembleCompany({
+    companyName: opts.name,
+    goal,
+    project,
+    baseName,
+    moduleNames: selectedModules,
+    extraRoleNames: selectedRoles,
+    outputDir: opts.outputDir,
+    templatesDir: opts.templatesDir,
+    onProgress: (line) => log(`  ${line}`)
+  });
+  log(`Workspace assembled: ${assemblyResult.companyDir}`);
+  if (opts.apiEnabled) {
+    log("");
+    log("Provisioning via Paperclip API...");
+    const client = new PaperclipClient(opts.apiBaseUrl);
+    const provisionResult = await provisionCompany({
+      client,
+      companyName: opts.name,
+      companyDir: assemblyResult.companyDir,
+      goal,
+      projectName: project.name,
+      projectDescription: project.description,
+      repoUrl: project.repoUrl,
+      allRoles: assemblyResult.allRoles,
+      rolesData,
+      initialTasks: assemblyResult.initialTasks,
+      model: opts.model,
+      startCeo: opts.startCeo,
+      onProgress: (line) => log(`  ${line}`)
+    });
+    log("");
+    log("Provisioned:");
+    log(`  Company:  ${provisionResult.companyId}`);
+    if (provisionResult.goalId) log(`  Goal:     ${provisionResult.goalId}`);
+    log(`  Project:  ${provisionResult.projectId}`);
+    log(`  Workspace: ${provisionResult.projectCwd}`);
+    for (const [role, id] of provisionResult.agentIds) {
+      log(`  Agent:    ${role} (${id})`);
+    }
+    if (provisionResult.issueIds.length) {
+      log(`  Issues:   ${provisionResult.issueIds.length} created`);
+    }
+    if (provisionResult.ceoStarted) {
+      log(`  CEO heartbeat started`);
+    }
+  }
+  log("");
+  log(`Done. Workspace: ${assemblyResult.companyDir}`);
+  if (!opts.apiEnabled) {
+    log("Follow BOOTSTRAP.md to set up in the Paperclip UI, or re-run with --api.");
+  }
+}
+
 // src/cli.jsx
 var import_jsx_runtime15 = __toESM(require_jsx_runtime(), 1);
 var __dirname = dirname(fileURLToPath(import.meta.url));
 var TEMPLATES_DIR = join4(__dirname, "..", "templates");
+var HELP = `
+  Clipper \u2014 Bootstrap a Paperclip company workspace
+
+  Usage:
+    clipper [options]
+
+  Company options:
+    --name <name>              Company name (required for non-interactive)
+    --goal <title>             Company goal title
+    --goal-description <desc>  Goal description
+    --project <name>           Project name (default: company name)
+    --project-description <d>  Project description
+    --repo <url>               GitHub repository URL
+    --preset <name>            Preset: fast, quality, rad, startup, research, full
+    --modules <a,b,c>          Comma-separated module names (added to preset)
+    --roles <a,b>              Comma-separated extra role names (added to preset)
+
+  Infrastructure options:
+    --output <dir>             Output directory (default: ./companies/)
+    --api                      Provision via Paperclip API after assembly
+    --api-url <url>            Paperclip API URL (default: http://localhost:3100)
+    --model <model>            LLM model for agents (default: adapter default)
+    --start                    Start CEO heartbeat after provisioning (implies --api)
+
+  Modes:
+    Interactive (default)      Wizard prompts for missing values
+    Non-interactive            Pass --name and --preset (minimum) to skip the wizard
+
+  Examples:
+    clipper                                          # interactive wizard
+    clipper --name "Acme" --preset fast               # headless, files only
+    clipper --name "Acme" --preset startup --api      # headless + API provisioning
+    clipper --name "Acme" --preset fast --roles product-owner --modules pr-review
+    clipper --name "Acme" --preset custom --modules github-repo,auto-assign
+
+  -h, --help                   Show this help
+`;
 function parseArgs(argv) {
   const args = argv.slice(2);
   const config2 = {
@@ -40751,59 +40959,128 @@ function parseArgs(argv) {
     apiEnabled: false,
     apiBaseUrl: "http://localhost:3100",
     model: null,
-    startCeo: false
+    startCeo: false,
+    // Company options
+    name: null,
+    goal: null,
+    goalDescription: null,
+    projectName: null,
+    projectDescription: null,
+    repo: null,
+    preset: null,
+    modules: [],
+    roles: []
   };
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === "--output" && args[i + 1]) {
-      config2.outputDir = resolve(args[i + 1]);
-      i++;
-    } else if (args[i] === "--api") {
-      config2.apiEnabled = true;
-    } else if (args[i] === "--api-url" && args[i + 1]) {
-      config2.apiBaseUrl = args[i + 1];
-      config2.apiEnabled = true;
-      i++;
-    } else if (args[i] === "--start") {
-      config2.startCeo = true;
-      config2.apiEnabled = true;
-    } else if (args[i] === "--model" && args[i + 1]) {
-      config2.model = args[i + 1];
-      i++;
-    } else if (args[i] === "--help" || args[i] === "-h") {
-      console.log(`
-  Clipper \u2014 Bootstrap a Paperclip company workspace
-
-  Usage:
-    clipper [options]
-
-  Options:
-    --output <dir>     Output directory (default: ./companies/)
-    --api              Provision via Paperclip API after assembly
-    --api-url <url>    Paperclip API URL (default: http://localhost:3100)
-    --model <model>    LLM model for agents (default: adapter default)
-    --start            Start CEO heartbeat after provisioning (implies --api)
-    -h, --help         Show this help
-`);
-      process.exit(0);
+    const arg = args[i];
+    const next = args[i + 1];
+    switch (arg) {
+      case "--output":
+        config2.outputDir = resolve(next);
+        i++;
+        break;
+      case "--api":
+        config2.apiEnabled = true;
+        break;
+      case "--api-url":
+        config2.apiBaseUrl = next;
+        config2.apiEnabled = true;
+        i++;
+        break;
+      case "--start":
+        config2.startCeo = true;
+        config2.apiEnabled = true;
+        break;
+      case "--model":
+        config2.model = next;
+        i++;
+        break;
+      case "--name":
+        config2.name = next;
+        i++;
+        break;
+      case "--goal":
+        config2.goal = next;
+        i++;
+        break;
+      case "--goal-description":
+        config2.goalDescription = next;
+        i++;
+        break;
+      case "--project":
+        config2.projectName = next;
+        i++;
+        break;
+      case "--project-description":
+        config2.projectDescription = next;
+        i++;
+        break;
+      case "--repo":
+        config2.repo = next;
+        i++;
+        break;
+      case "--preset":
+        config2.preset = next;
+        i++;
+        break;
+      case "--modules":
+        config2.modules = next.split(",").map((s) => s.trim()).filter(Boolean);
+        i++;
+        break;
+      case "--roles":
+        config2.roles = next.split(",").map((s) => s.trim()).filter(Boolean);
+        i++;
+        break;
+      case "--help":
+      case "-h":
+        console.log(HELP);
+        process.exit(0);
+        break;
+      default:
+        if (arg.startsWith("-")) {
+          console.error(`Unknown flag: ${arg}`);
+          console.error("Run clipper --help for usage.");
+          process.exit(1);
+        }
     }
   }
   return config2;
 }
 var config = parseArgs(process.argv);
-var app = render_default(
-  /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
-    App2,
-    {
-      outputDir: config.outputDir,
-      templatesDir: TEMPLATES_DIR,
-      apiEnabled: config.apiEnabled,
-      apiBaseUrl: config.apiBaseUrl,
-      model: config.model,
-      startCeo: config.startCeo
-    }
-  )
-);
-await app.waitUntilExit();
+var isHeadless = config.name && config.preset;
+if (isHeadless) {
+  runHeadless({
+    ...config,
+    templatesDir: TEMPLATES_DIR
+  }).catch((err) => {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  });
+} else {
+  const app = render_default(
+    /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
+      App2,
+      {
+        outputDir: config.outputDir,
+        templatesDir: TEMPLATES_DIR,
+        apiEnabled: config.apiEnabled,
+        apiBaseUrl: config.apiBaseUrl,
+        model: config.model,
+        startCeo: config.startCeo,
+        initialName: config.name,
+        initialGoal: config.goal,
+        initialGoalDescription: config.goalDescription,
+        initialProjectName: config.projectName,
+        initialProjectDescription: config.projectDescription,
+        initialRepo: config.repo,
+        initialPreset: config.preset,
+        initialModules: config.modules,
+        initialRoles: config.roles
+      }
+    )
+  );
+  await app.waitUntilExit();
+}
 /*! Bundled license information:
 
 react/cjs/react.production.js:
