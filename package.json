@@ -1,5 +1,5 @@
 {
-  "name": "paperclipper",
+  "name": "@lx0/paperclipper",
   "version": "0.1.0",
   "description": "Bootstrap a Paperclip company workspace from modular templates. Company as code.",
   "type": "module",
