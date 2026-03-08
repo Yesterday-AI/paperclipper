@@ -1,6 +1,6 @@
 # Clipper
 
-> Company as code. Bootstrap a [Paperclip](https://github.com/paperclipai/paperclip) company workspace from modular templates.
+> Bootstrap a [Paperclip](https://github.com/paperclipai/paperclip) company workspace from modular templates.
 
 Clipper assembles a ready-to-run company workspace by combining a base org structure with composable modules and optional specialist roles. Capabilities adapt gracefully — adding a Product Owner makes it the primary owner of backlog management, with the CEO as automatic fallback. Adding a UX Researcher makes them the primary market analyst. The system works with just CEO + Engineer and gets better as you add roles.
 

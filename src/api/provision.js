@@ -81,9 +81,15 @@ export async function provisionCompany({
     onProgress(`  repo: ${repoUrl}`);
   }
 
-  // 4. Create agents
+  // 4. Create agents (CEO first, then others with reportsTo)
   const agentIds = new Map();
-  for (const role of allRoles) {
+
+  // Sort roles: CEO first so other agents can reference its ID via reportsTo
+  const sortedRoles = [...allRoles].sort((a, b) =>
+    a === "ceo" ? -1 : b === "ceo" ? 1 : 0,
+  );
+
+  for (const role of sortedRoles) {
     const roleData = rolesData.get(role);
     const paperclipRole = PaperclipClient.resolveRole(role, roleData);
     const title = formatRoleName(role);
@@ -92,11 +98,16 @@ export async function provisionCompany({
     const roleAdapter = roleData?.adapter || {};
     const agentModel = roleAdapter.model || model;
 
+    // Resolve reportsTo from role.json role name → agent UUID
+    const reportsToRole = roleData?.reportsTo || null;
+    const reportsToAgentId = reportsToRole ? agentIds.get(reportsToRole) || null : null;
+
     onProgress(`Creating ${title} agent...`);
     const agent = await client.createAgent(companyId, {
       name: title,
       role: paperclipRole,
       title,
+      reportsTo: reportsToAgentId,
       adapterConfig: {
         cwd: companyDir,
         instructionsFilePath: join(companyDir, `agents/${role}/AGENTS.md`),

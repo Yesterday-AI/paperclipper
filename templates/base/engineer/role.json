@@ -3,6 +3,7 @@
   "title": "Software Engineer",
   "paperclipRole": "engineer",
   "description": "Implements features, fixes bugs, writes tests, manages git workflow.",
+  "reportsTo": "ceo",
   "adapter": {
     "model": "claude-sonnet-4-6"
   }

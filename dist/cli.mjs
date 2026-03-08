@@ -40008,13 +40008,14 @@ var PaperclipClient = class {
       body: JSON.stringify({ name, description: description || null })
     });
   }
-  async createAgent(companyId, { name, role, title, adapterConfig }) {
+  async createAgent(companyId, { name, role, title, reportsTo, adapterConfig }) {
     return this._fetch(`/api/companies/${companyId}/agents`, {
       method: "POST",
       body: JSON.stringify({
         name,
         role,
         title: title || null,
+        reportsTo: reportsTo || null,
         adapterType: "claude_local",
         adapterConfig: {
           dangerouslySkipPermissions: true,
@@ -40129,17 +40130,23 @@ async function provisionCompany({
     onProgress(`  repo: ${repoUrl}`);
   }
   const agentIds = /* @__PURE__ */ new Map();
-  for (const role of allRoles) {
+  const sortedRoles = [...allRoles].sort(
+    (a, b) => a === "ceo" ? -1 : b === "ceo" ? 1 : 0
+  );
+  for (const role of sortedRoles) {
     const roleData = rolesData.get(role);
     const paperclipRole = PaperclipClient.resolveRole(role, roleData);
     const title = formatRoleName(role);
     const roleAdapter = roleData?.adapter || {};
     const agentModel = roleAdapter.model || model;
+    const reportsToRole = roleData?.reportsTo || null;
+    const reportsToAgentId = reportsToRole ? agentIds.get(reportsToRole) || null : null;
     onProgress(`Creating ${title} agent...`);
     const agent = await client.createAgent(companyId, {
       name: title,
       role: paperclipRole,
       title,
+      reportsTo: reportsToAgentId,
       adapterConfig: {
         cwd: companyDir,
         instructionsFilePath: join2(companyDir, `agents/${role}/AGENTS.md`),
