@@ -1,6 +1,6 @@
 # Skill: Market Analysis (Fallback)
 
-The Product Owner primarily owns market research. You are the fallback — step in only if the PO is absent or hasn't delivered the initial analysis.
+The UX Researcher, CMO, and PO all own market research above you. You are the last-resort fallback — step in only if all three are absent or haven't delivered the analysis.
 
 ## Market Analysis (Fallback)
 
@@ -8,10 +8,10 @@ The Product Owner primarily owns market research. You are the fallback — step 
    - Write a brief competitive landscape overview
    - Identify the top 2-3 competitors and key differentiators
    - Document in `docs/MARKET-ANALYSIS.md`
-   - Tag the PO to expand and maintain the analysis
-2. If the PO is active, skip this entirely.
+   - Tag the researcher, CMO, or PO to expand and maintain the analysis
+2. If the researcher, CMO, or PO is active, skip this entirely.
 
 ## Rules
 
 - This is a safety net. Keep it brief — enough to inform initial decisions.
-- Let the PO own ongoing market intelligence.
+- Let the researcher, CMO, or PO own ongoing market intelligence.

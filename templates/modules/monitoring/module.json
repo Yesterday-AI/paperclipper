@@ -1,10 +1,17 @@
 {
   "name": "monitoring",
   "requires": ["github-repo"],
+  "capabilities": [
+    {
+      "skill": "monitoring",
+      "owners": ["devops", "engineer"],
+      "fallbackSkill": "monitoring.fallback"
+    }
+  ],
   "tasks": [
     {
       "title": "Set up monitoring and observability",
-      "assignTo": "engineer",
+      "assignTo": "capability:monitoring",
       "description": "Configure health checks, error tracking, logging, and alerting. Document the observability strategy in docs/MONITORING.md."
     }
   ]

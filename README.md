@@ -61,7 +61,7 @@ Requires **Node.js 20+**.
 
 The interactive wizard walks through these steps:
 
-```
+```text
 $ clipper --api
 
   ╭──────────────╮
@@ -147,7 +147,7 @@ clipper --name "$COMPANY" --preset "$PRESET" --api --api-url "$API_URL" --start
 
 ## What You Get
 
-```
+```text
 companies/AcmeCorp/
 ├── BOOTSTRAP.md              # Setup guide (goal, project, agents, tasks)
 ├── agents/
@@ -180,16 +180,18 @@ Capabilities extend, they don't require. Start with CEO + Engineer, add speciali
 
 | Capability | Primary Owner | Fallback | Module |
 | :--------- | :------------ | :------- | :----- |
-| `market-analysis` | UX Researcher &rarr; Product Owner | CEO | market-analysis |
+| `market-analysis` | UX Researcher &rarr; CMO &rarr; Product Owner | CEO | market-analysis |
 | `hiring-review` | Product Owner | CEO | hiring-review |
 | `roadmap-to-issues` | Product Owner | CEO | roadmap-to-issues |
 | `auto-assign` | Product Owner | CEO | auto-assign |
-| `user-testing` | UX Researcher &rarr; Product Owner | CEO | user-testing |
-| `brand-identity` | UI Designer | CEO | brand-identity |
+| `user-testing` | QA &rarr; UX Researcher &rarr; Product Owner | CEO | user-testing |
+| `brand-identity` | UI Designer &rarr; CMO | CEO | brand-identity |
+| `ci-cd` | DevOps | Engineer | ci-cd |
+| `monitoring` | DevOps | Engineer | monitoring |
 | `tech-stack` | Engineer | CEO | tech-stack |
 | `architecture-plan` | Engineer | CEO | architecture-plan |
 | `design-system` | UI Designer | Engineer | architecture-plan |
-| `pr-review` | Code Reviewer / Product Owner | — | pr-review |
+| `pr-review` | Code Reviewer / Product Owner / UI Designer / UX Researcher / QA / DevOps | — | pr-review |
 | `stall-detection` | CEO (always) | — | stall-detection |
 | `vision-workshop` | CEO (always) | — | vision-workshop |
 
@@ -256,8 +258,8 @@ Capabilities extend, they don't require. Start with CEO + Engineer, add speciali
 | **`roadmap-to-issues`** | Auto-generate issues from goals when backlog runs low | Primary owner creates initial backlog |
 | **`auto-assign`** | Assign unassigned issues to idle agents | — |
 | **`stall-detection`** | Detect stuck handovers, nudge or escalate | — |
-| **`ci-cd`** | Continuous integration and deployment pipeline | Engineer sets up CI/CD |
-| **`monitoring`** | Observability, alerting, health checks | Engineer sets up monitoring |
+| **`ci-cd`** | Continuous integration and deployment pipeline | Primary owner sets up CI/CD |
+| **`monitoring`** | Observability, alerting, health checks | Primary owner sets up monitoring |
 
 <details>
 <summary><strong>Module details</strong></summary>
@@ -274,8 +276,8 @@ Defines the strategic foundation. The CEO runs a vision workshop to refine the c
 
 Researches the target market, competitors, and positioning.
 
-- **Capability:** `market-analysis` — owners: `ux-researcher` &rarr; `product-owner` &rarr; `ceo`
-- **Fallback:** CEO creates a brief overview only
+- **Capability:** `market-analysis` — owners: `ux-researcher` &rarr; `cmo` &rarr; `product-owner` &rarr; `ceo`
+- **Fallback:** CMO focuses on positioning and competitive landscape; CEO creates a brief overview only
 - **Doc:** `docs/market-analysis-template.md`
 
 #### hiring-review
@@ -310,7 +312,7 @@ Git workflow and commit conventions.
 
 #### pr-review
 
-PR-based review workflow. Requires `github-repo`. Activates with `code-reviewer` or `product-owner`.
+PR-based review workflow. Requires `github-repo`. Activates with `code-reviewer`, `product-owner`, `ui-designer`, `ux-researcher`, `qa`, or `devops`.
 
 - **Task:** Engineer sets up branch protection
 - **Doc:** `docs/pr-conventions.md`
@@ -333,30 +335,32 @@ Assigns unassigned issues to idle agents.
 
 Creates brand guidelines: logo usage, color palette, typography, iconography, and tone of voice.
 
-- **Capability:** `brand-identity` — owners: `ui-designer` &rarr; `ceo`
-- **Fallback:** CEO creates minimal provisional placeholder
+- **Capability:** `brand-identity` — owners: `ui-designer` &rarr; `cmo` &rarr; `ceo`
+- **Fallback:** CMO focuses on brand strategy and messaging; CEO creates minimal provisional placeholder
 - **Doc:** `docs/brand-identity-template.md`
 
 #### user-testing
 
 Designs and executes usability evaluations, documents findings with severity ratings.
 
-- **Capability:** `user-testing` — owners: `ux-researcher` &rarr; `product-owner` &rarr; `ceo`
-- **Fallback:** CEO creates a basic heuristic checklist
+- **Capability:** `user-testing` — owners: `qa` &rarr; `ux-researcher` &rarr; `product-owner` &rarr; `ceo`
+- **Fallback:** QA adds test automation and edge case coverage; CEO creates a basic heuristic checklist
 - **Doc:** `docs/user-testing-template.md`
 
 #### ci-cd
 
 Continuous integration and deployment pipeline. Requires `github-repo`.
 
-- **Task:** Engineer sets up CI/CD
+- **Capability:** `ci-cd` — owners: `devops` &rarr; `engineer`
+- **Fallback:** Engineer sets up basic CI (lint, test, build); DevOps owns full pipeline lifecycle including CD
 - **Doc:** `docs/ci-cd-template.md`
 
 #### monitoring
 
 Observability, error tracking, logging, alerting, and health checks. Requires `github-repo`.
 
-- **Task:** Engineer sets up monitoring
+- **Capability:** `monitoring` — owners: `devops` &rarr; `engineer`
+- **Fallback:** Engineer sets up basic health checks and structured logging; DevOps owns full observability stack
 - **Doc:** `docs/monitoring-template.md`
 
 #### stall-detection
@@ -376,7 +380,7 @@ Every company starts with **CEO** and **Engineer** (base roles). These optional 
 | Role | Paperclip role | Reports to | Enhances |
 | :--- | :------------- | :--------- | :------- |
 | **Product Owner** | `pm` | CEO | Takes over roadmap, auto-assign, hiring-review from CEO |
-| **Code Reviewer** | `qa` | CEO | Enables pr-review activation |
+| **Code Reviewer** | `general` | CEO | Enables pr-review activation |
 | **UI & Brand Designer** | `designer` | CEO | Takes over design-system and brand-identity |
 | **UX Researcher** | `researcher` | CEO | Takes over market-analysis and user-testing |
 | **CTO** | `cto` | CEO | Technical leadership, architecture oversight |
@@ -451,7 +455,7 @@ Follow the `BOOTSTRAP.md` file generated in the company directory. It lists ever
 
 ### Add a module
 
-```
+```text
 templates/modules/<name>/
 ├── module.json                  # Name, capabilities, tasks, dependencies
 ├── skills/                      # Shared skills (used by any primary owner)
@@ -507,7 +511,7 @@ When assembling a capability's primary skill, the system checks in order:
 
 First match wins. Most capabilities only need a shared skill. Role-specific overrides exist only when a role brings a genuinely different approach. Fallback variants are always role-specific.
 
-```
+```text
 Example: market-analysis module
 ├── skills/
 │   └── market-analysis.md                    # Shared: any primary owner
@@ -527,7 +531,7 @@ Example: market-analysis module
 
 ### Add a role
 
-```
+```text
 templates/roles/<name>/
 ├── role.json        # Name, title, paperclipRole, reportsTo, adapter
 ├── AGENTS.md

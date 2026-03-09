@@ -10,9 +10,9 @@ When this skill is active, you work in feature branches and open PRs instead of 
 4. Push branch: `git push -u origin <branch-name>`
 5. Open PR: `gh pr create --title "<type>: <description>" --body "<template>"`
 6. Set originating issue to `in_review`
-7. @-mention @Code Reviewer and @Product Owner on the issue with the PR link
+7. @-mention @Code Reviewer and @Product Owner on the issue with the PR link (also @UI Designer, @UX Researcher, @QA, @DevOps if present and relevant)
 8. Wait for reviews
-9. When both approve: `gh pr merge <number> --merge`
+9. When Code Reviewer and Product Owner both approve (and no domain blockers from other reviewers): `gh pr merge <number> --merge`
 10. Set issue to `done`
 
 ## Rules

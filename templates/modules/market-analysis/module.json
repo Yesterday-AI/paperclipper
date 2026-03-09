@@ -3,7 +3,7 @@
   "capabilities": [
     {
       "skill": "market-analysis",
-      "owners": ["ux-researcher", "product-owner", "ceo"],
+      "owners": ["ux-researcher", "cmo", "product-owner", "ceo"],
       "fallbackSkill": "market-analysis.fallback"
     }
   ],

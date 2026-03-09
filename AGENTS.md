@@ -52,8 +52,8 @@ clipper/
 │   └── api/                    # Paperclip API client + provisioning
 ├── templates/
 │   ├── base/                   # Always-present roles (ceo, engineer)
-│   ├── roles/                  # Optional roles (product-owner, code-reviewer, ui-designer, ux-researcher)
-│   ├── modules/                # Composable capabilities (10 modules)
+│   ├── roles/                  # Optional roles (9: product-owner, code-reviewer, ui-designer, ux-researcher, cto, cmo, cfo, devops, qa)
+│   ├── modules/                # Composable capabilities (14 modules)
 │   │   ├── vision-workshop/    # Strategic foundation
 │   │   ├── market-analysis/    # Market research
 │   │   ├── hiring-review/      # Team gap analysis
@@ -63,7 +63,11 @@ clipper/
 │   │   ├── pr-review/          # PR-based code review
 │   │   ├── roadmap-to-issues/  # Backlog generation
 │   │   ├── auto-assign/        # Idle agent → issue matching
-│   │   └── stall-detection/    # Stuck handover detection
+│   │   ├── stall-detection/    # Stuck handover detection
+│   │   ├── brand-identity/     # Brand guidelines and visual identity
+│   │   ├── user-testing/       # Usability evaluations
+│   │   ├── ci-cd/              # CI/CD pipeline
+│   │   └── monitoring/         # Observability and alerting
 │   └── presets/                # Curated combinations (fast, quality, rad, startup, research, full)
 ├── dist/cli.mjs                # Built CLI (esbuild bundle)
 └── esbuild.config.mjs          # Build config
@@ -80,7 +84,5 @@ Each module contains:
 See [ROADMAP.md](ROADMAP.md) for the full backlog. Key areas:
 
 - **AI wizard mode** — Describe the company in natural language, let an LLM select the best configuration
-- **More modules** — user-testing, brand-identity, ci-cd, monitoring
-- **More roles** — CTO, CMO, CFO, DevOps, QA
+- **`--dry-run` flag** — Show summary and exit without writing files
 - **Excalidraw MCP integration** — Visual diagram generation as an agent skill
-- **Runtime capability awareness** — Agents know at runtime which capabilities their company has

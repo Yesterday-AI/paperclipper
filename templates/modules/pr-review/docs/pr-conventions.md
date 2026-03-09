@@ -58,10 +58,15 @@ Two-role review via @-mention on the originating issue:
 
 - **Code Reviewer**: Correctness, security, style, simplicity. Uses `gh pr review`.
 - **Product Owner**: Intent alignment, scope discipline, acceptance criteria. Posts review as PR comment.
+- **UI Designer** *(when present)*: Visual consistency, brand compliance, accessibility, design token usage.
+- **UX Researcher** *(when present)*: Usability, user flow integrity, cognitive load, error handling UX.
+- **QA Engineer** *(when present)*: Test coverage, edge cases, regression risk, boundary conditions.
+- **DevOps Engineer** *(when present)*: Infrastructure impact, security, performance, rollback safety.
 
 ## Merge Rules
 
-- Both Code Reviewer and Product Owner must approve
+- Code Reviewer and Product Owner must approve (required)
+- Other reviewers provide advisory feedback — blocking only for their domain-critical issues (e.g., security for DevOps, accessibility for UI Designer)
 - CI must pass
 - No force pushes
 - Merge using `gh pr merge <number> --merge`

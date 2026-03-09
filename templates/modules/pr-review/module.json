@@ -1,7 +1,7 @@
 {
   "name": "pr-review",
   "requires": ["github-repo"],
-  "activatesWithRoles": ["code-reviewer", "product-owner"],
+  "activatesWithRoles": ["code-reviewer", "product-owner", "ui-designer", "ux-researcher", "qa", "devops"],
   "capabilities": [],
   "tasks": [
     {

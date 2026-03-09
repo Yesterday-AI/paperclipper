@@ -3,7 +3,7 @@
   "capabilities": [
     {
       "skill": "brand-identity",
-      "owners": ["ui-designer", "ceo"],
+      "owners": ["ui-designer", "cmo", "ceo"],
       "fallbackSkill": "brand-identity.fallback"
     }
   ],

@@ -15,6 +15,11 @@
 - TUI modernization — step counter, consistent prompts, cleaner summary and output
 - OSS repo polish — badges, CONTRIBUTING.md, CI, issue/PR templates, .editorconfig
 - Remove legacy `create-company.mjs` CLI
+- Wire devops into ci-cd and monitoring modules (capability ownership chains with engineer fallback)
+- Wire qa into user-testing module (capability ownership chain)
+- Wire cmo into brand-identity and market-analysis modules (fallback chains)
+- Expand pr-review activatesWithRoles to include ui-designer, ux-researcher, qa, devops
+- Wire ui-designer, ux-researcher, qa, devops into pr-review module (design review, UX review, QA review, infra review skill files)
 
 ## In Progress
 
@@ -24,9 +29,6 @@
 
 - [ ] AI wizard mode — describe the company in natural language and let an LLM select the best configuration automatically
 - [ ] `--dry-run` flag — show summary and exit without writing files
-- [ ] Wire ui-designer and ux-researcher into pr-review module (design review, UX review skill files)
-- [ ] Wire devops into ci-cd and monitoring modules (capability ownership chains)
-- [ ] Wire qa into user-testing module (capability ownership chain)
 
 ### Template System
 

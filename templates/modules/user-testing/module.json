@@ -3,7 +3,7 @@
   "capabilities": [
     {
       "skill": "user-testing",
-      "owners": ["ux-researcher", "product-owner", "ceo"],
+      "owners": ["qa", "ux-researcher", "product-owner", "ceo"],
       "fallbackSkill": "user-testing.fallback"
     }
   ],

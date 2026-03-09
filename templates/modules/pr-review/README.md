@@ -4,7 +4,8 @@ Adds a PR-based review workflow with dedicated reviewer roles.
 
 ## What it adds
 
-- **New roles**: Code Reviewer, Product Owner
+- **Core roles**: Code Reviewer, Product Owner (required reviewers)
+- **Extended roles** *(when present)*: UI Designer (design review), UX Researcher (UX review), QA (quality review), DevOps (infra review)
 - **Shared docs**: `docs/pr-conventions.md` — PR format, review workflow, merge rules
 - **Engineer skill**: Feature-branch + PR workflow (overrides direct-to-main from `github-repo`)
 - **Reviewer skills**: Review checklists for each reviewer role
@@ -17,10 +18,14 @@ Adds a PR-based review workflow with dedicated reviewer roles.
 
 1. Engineer creates a feature branch (`<prefix>-<N>/<short-description>`)
 2. Engineer opens a PR with Conventional Commits title and issue reference
-3. Engineer @-mentions Code Reviewer and Product Owner on the issue
+3. Engineer @-mentions Code Reviewer and Product Owner on the issue (plus other reviewers if present and relevant)
 4. Code Reviewer reviews for correctness, security, style, simplicity
 5. Product Owner reviews for intent alignment, scope discipline, acceptance criteria
-6. Engineer merges when both approve
+6. UI Designer reviews for visual consistency, brand compliance *(when present)*
+7. UX Researcher reviews for usability and user flow integrity *(when present)*
+8. QA reviews for test coverage, edge cases, regression risk *(when present)*
+9. DevOps reviews for infrastructure impact, security, performance *(when present)*
+10. Engineer merges when required reviewers approve and no domain blockers remain
 
 ## Handover mechanism
 

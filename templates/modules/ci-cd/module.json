@@ -1,10 +1,17 @@
 {
   "name": "ci-cd",
   "requires": ["github-repo"],
+  "capabilities": [
+    {
+      "skill": "ci-cd",
+      "owners": ["devops", "engineer"],
+      "fallbackSkill": "ci-cd.fallback"
+    }
+  ],
   "tasks": [
     {
       "title": "Set up CI/CD pipeline",
-      "assignTo": "engineer",
+      "assignTo": "capability:ci-cd",
       "description": "Configure continuous integration (lint, test, build) and deployment pipeline. Document the setup in docs/CI-CD.md. Use GitHub Actions or equivalent."
     }
   ]

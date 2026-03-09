@@ -1,7 +1,7 @@
 {
   "name": "code-reviewer",
   "title": "Code Reviewer",
-  "paperclipRole": "qa",
+  "paperclipRole": "general",
   "description": "Reviews PRs for correctness, security, and code style.",
   "reportsTo": "ceo",
   "enhances": [
