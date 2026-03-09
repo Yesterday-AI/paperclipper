@@ -39694,10 +39694,17 @@ async function assembleCompany({
   for (const role of extraRoleNames) allRoles.add(role);
   for (const role of baseEntries) {
     if (!role.isDirectory()) continue;
-    await copyDir(
-      join(baseDir, role.name),
-      join(companyDir, "agents", role.name)
-    );
+    const roleSrc = join(baseDir, role.name);
+    const roleDest = join(companyDir, "agents", role.name);
+    await mkdir(roleDest, { recursive: true });
+    const entries = await readdir(roleSrc, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        await copyDir(join(roleSrc, entry.name), join(roleDest, entry.name));
+      } else if (!entry.name.endsWith(".json")) {
+        await copyFile(join(roleSrc, entry.name), join(roleDest, entry.name));
+      }
+    }
     onProgress(`+ agents/${role.name}/ (base)`);
   }
   for (const roleName of extraRoleNames) {
