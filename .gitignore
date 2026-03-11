@@ -6,6 +6,7 @@ companies/
 ~*/
 
 # Node modules
+dist/
 node_modules/
 
 # System files
