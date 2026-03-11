@@ -154,6 +154,8 @@ clipper --name "$COMPANY" --preset "$PRESET" --api --api-url "$API_URL" --start
 
 `--modules` and `--roles` are additive — they merge with whatever the preset includes.
 
+> **Goal generation:** [Paperize](https://www.npmjs.com/package/paperize) distills notes, ideas, research, or Obsidian vaults into actionable goals via AI. Use it to generate goals for Clipper programmatically: `npx paperize --source ~/notes`.
+
 ### AI wizard mode
 
 Let Claude figure out the best setup. Two sub-modes — **interview** (3 guided questions) and **single-shot** (one description).
