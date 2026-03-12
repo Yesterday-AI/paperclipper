@@ -1,6 +1,7 @@
 {
   "name": "engineer",
   "title": "Software Engineer",
+  "base": true,
   "paperclipRole": "engineer",
   "description": "Implements features, fixes bugs, writes tests, manages git workflow.",
   "reportsTo": "ceo",

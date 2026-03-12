@@ -534,7 +534,7 @@ Follow the `BOOTSTRAP.md` file generated in the company directory. It lists ever
 
 ```text
 templates/modules/<name>/
-├── module.json                  # Name, capabilities, tasks, dependencies
+├── module.meta.json             # Name, capabilities, tasks, dependencies, permissions
 ├── skills/                      # Shared skills (used by any primary owner)
 │   └── <skill>.md
 ├── agents/<role>/
@@ -564,13 +564,14 @@ The naming convention is the contract: `UPPERCASE.md` from another module → al
 </details>
 
 <details>
-<summary><strong>module.json schema</strong></summary>
+<summary><strong>module.meta.json schema</strong></summary>
 
 ```json
 {
   "name": "my-module",
   "requires": ["other-module"],
   "activatesWithRoles": ["my-role"],
+  "permissions": ["tasks:assign"],
   "capabilities": [
     {
       "skill": "my-skill",
@@ -630,7 +631,7 @@ Example: market-analysis module
 
 ```text
 templates/roles/<name>/
-├── role.json        # Name, title, paperclipRole, reportsTo, adapter
+├── role.meta.json   # Name, title, base, paperclipRole, reportsTo, adapter
 ├── AGENTS.md
 ├── SOUL.md
 ├── HEARTBEAT.md
@@ -638,12 +639,13 @@ templates/roles/<name>/
 ```
 
 <details>
-<summary><strong>role.json schema</strong></summary>
+<summary><strong>role.meta.json schema</strong></summary>
 
 ```json
 {
   "name": "my-role",
   "title": "My Role",
+  "base": false,
   "paperclipRole": "general",
   "description": "What this role does",
   "reportsTo": "ceo",
@@ -656,6 +658,7 @@ templates/roles/<name>/
 
 | Field | Description |
 | :---- | :---------- |
+| `base` | `true` for always-present roles (ceo, engineer). Omit or `false` for optional roles. |
 | `paperclipRole` | Paperclip enum: `ceo`, `engineer`, `pm`, `qa`, `designer`, `cto`, `cmo`, `cfo`, `devops`, `researcher`, `general` |
 | `adapter` | Passed to `adapterConfig` during provisioning. `--model` CLI flag is fallback. |
 
@@ -663,12 +666,13 @@ templates/roles/<name>/
 
 ### Add a preset
 
+Create `templates/presets/<name>/preset.meta.json`:
+
 ```json
 {
   "name": "my-preset",
   "description": "What this preset is for",
   "constraints": [],
-  "base": "base",
   "roles": ["product-owner"],
   "modules": ["github-repo", "backlog"]
 }

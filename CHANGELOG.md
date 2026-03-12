@@ -2,6 +2,18 @@
 
 All notable changes to Clipper are documented here.
 
+## [0.3.7] — 2026-03-12
+
+### Changed
+
+- **Template metadata renamed** — All metadata files renamed from `*.json` to `*.meta.json` (`role.meta.json`, `module.meta.json`, `preset.meta.json`) for clearer separation from content files.
+- **Base roles consolidated** — `templates/base/` removed. CEO and Engineer now live in `templates/roles/` with a `"base": true` flag in their `role.meta.json`. The `baseName` parameter and preset `"base"` field are eliminated — base roles are discovered dynamically from metadata.
+- **`buildAllRoles()` signature** — Now accepts an array of role objects (with `base` flag) instead of a hardcoded string array. Callers no longer need to know which roles are base.
+
+### Added
+
+- **Module permissions** — `module.meta.json` supports a `permissions` field declaring Paperclip API permissions required by capability owners (e.g., `"permissions": ["tasks:assign"]` on auto-assign). Used during provisioning to grant agents the permissions their modules need.
+
 ## [0.3.6] — 2026-03-11
 
 ### Added

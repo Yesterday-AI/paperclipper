@@ -4,7 +4,6 @@
   "constraints": [
     "Not suited for more than one implementing engineer — lacks review process and parallel commits to main will cause conflicts."
   ],
-  "base": "base",
   "modules": [
     "github-repo",
     "backlog",

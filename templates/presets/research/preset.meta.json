@@ -4,7 +4,6 @@
   "constraints": [
     "No GitHub repo or code workflow. Add github-repo and backlog when ready to build."
   ],
-  "base": "base",
   "modules": [
     "vision-workshop",
     "market-analysis",

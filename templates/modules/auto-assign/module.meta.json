@@ -1,5 +1,6 @@
 {
   "name": "auto-assign",
+  "permissions": ["tasks:assign"],
   "capabilities": [
     {
       "skill": "auto-assign",

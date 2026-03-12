@@ -5,7 +5,6 @@
     "No PR review — speed over process. Add pr-review module when the codebase stabilizes.",
     "No upfront market or architecture analysis — prototype first, formalize later."
   ],
-  "base": "base",
   "modules": [
     "tech-stack",
     "hiring-review",
