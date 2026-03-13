@@ -106,7 +106,15 @@ export function StepDone() {
           Create another
         </Button>
         <Button asChild>
-          <a href="http://localhost:3100" target="_blank" rel="noopener noreferrer">
+          <a
+            href={
+              result?.paperclipUrl && result?.issuePrefix
+                ? `${result.paperclipUrl}/${result.issuePrefix}/dashboard`
+                : result?.paperclipUrl || "http://localhost:3100"
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <ExternalLink className="h-4 w-4" />
             Open Paperclip
           </a>

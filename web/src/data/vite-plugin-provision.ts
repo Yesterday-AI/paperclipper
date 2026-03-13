@@ -165,6 +165,8 @@ export function provisionApiPlugin(): Plugin {
 
           send("result", {
             companyId: result.companyId,
+            issuePrefix: result.issuePrefix,
+            paperclipUrl,
             goalId: result.goalId,
             projectId: result.projectId,
             agentIds: Object.fromEntries(result.agentIds),

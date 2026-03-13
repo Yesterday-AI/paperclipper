@@ -13,7 +13,7 @@ companies/
 !.env*.example
 
 # Install & Build artifacts
-dist/
+web/dist/
 node_modules/
 *.tsbuildinfo
 

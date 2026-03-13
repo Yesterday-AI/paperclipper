@@ -199,6 +199,7 @@ export async function provisionCompany({
 
   return {
     companyId,
+    issuePrefix: company.issuePrefix,
     goalId,
     goalTemplateId,
     projectId,

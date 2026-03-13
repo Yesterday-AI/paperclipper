@@ -37,6 +37,8 @@ export interface Project {
 
 export interface ProvisionResult {
   companyId: string;
+  issuePrefix?: string;
+  paperclipUrl?: string;
   goalId?: string;
   projectId?: string;
   agentIds: Record<string, string>;
