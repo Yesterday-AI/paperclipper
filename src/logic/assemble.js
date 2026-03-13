@@ -66,6 +66,7 @@ export function toPascalCase(name) {
  * @param {object} opts.project - { name, repoUrl }
  * @param {string[]} opts.moduleNames
  * @param {string[]} opts.extraRoleNames
+ * @param {object|null} opts.goalTemplate - Selected goal template (from templates/goals/)
  * @param {string} opts.outputDir
  * @param {string} opts.templatesDir
  * @param {(line: string) => void} opts.onProgress
@@ -77,6 +78,7 @@ export async function assembleCompany({
   project = {},
   moduleNames,
   extraRoleNames,
+  goalTemplate = null,
   outputDir,
   templatesDir,
   onProgress = () => {},
@@ -108,6 +110,25 @@ export async function assembleCompany({
 
   // Determine all roles present
   const allRoles = new Set([...baseRoleNames, ...extraRoleNames]);
+
+  // Validate module dependencies before starting assembly.
+  // Skip modules that won't activate (missing directory or gated by activatesWithRoles).
+  const selectedSet = new Set(moduleNames);
+  for (const moduleName of moduleNames) {
+    const moduleDir = join(templatesDir, 'modules', moduleName);
+    if (!(await exists(moduleDir))) continue;
+    const moduleJson = await readJson(join(moduleDir, 'module.meta.json'));
+    if (moduleJson?.activatesWithRoles?.length) {
+      const hasActivatingRole = moduleJson.activatesWithRoles.some((r) => allRoles.has(r));
+      if (!hasActivatingRole) continue;
+    }
+    const deps = moduleJson?.requires || [];
+    for (const dep of deps) {
+      if (!selectedSet.has(dep)) {
+        throw new Error(`Module "${moduleName}" requires module "${dep}", which is not selected`);
+      }
+    }
+  }
 
   // 1. Copy base roles (exclude .meta.json metadata)
   for (const roleName of baseRoleNames) {
@@ -398,6 +419,27 @@ export async function assembleCompany({
     bootstrap += `- **cwd**: \`${companyDir}\`\n\n`;
   }
 
+  // Goal template
+  if (goalTemplate) {
+    bootstrap += `## Starter Goal: ${goalTemplate.title}\n\n`;
+    bootstrap += `${goalTemplate.description}\n\n`;
+    if (goalTemplate.milestones?.length) {
+      bootstrap += `**Milestones:**\n`;
+      for (const m of goalTemplate.milestones) {
+        bootstrap += `- ${m.title}\n`;
+      }
+      bootstrap += `\n`;
+    }
+    if (goalTemplate.issues?.length) {
+      bootstrap += `**Issues:**\n`;
+      for (const issue of goalTemplate.issues) {
+        const assignLabel = issue.assignTo ? ` → ${issue.assignTo}` : '';
+        bootstrap += `- ${issue.title}${assignLabel}\n`;
+      }
+      bootstrap += `\n`;
+    }
+  }
+
   // Initial tasks
   if (initialTasks.length > 0) {
     bootstrap += `## Initial Tasks\n\n`;
@@ -424,6 +466,9 @@ export async function assembleCompany({
   bootstrap += `${stepN++}. Create each agent listed above\n`;
   if (goal?.title) {
     bootstrap += `${stepN++}. Create the goal: "${goal.title}"\n`;
+  }
+  if (goalTemplate) {
+    bootstrap += `${stepN++}. Create the starter goal "${goalTemplate.title}" and its issues listed above\n`;
   }
   if (initialTasks.length > 0) {
     bootstrap += `${stepN++}. Create the initial issues listed above\n`;

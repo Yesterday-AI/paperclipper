@@ -5,15 +5,17 @@ companies/
 ~*.md
 ~*/
 
-# Node modules
-node_modules/
-
 # System files
 .DS_Store
 
 # Secrets
 .env*
 !.env*.example
+
+# Install & Build artifacts
+web/dist/
+node_modules/
+*.tsbuildinfo
 
 # Claude user settings (local only)
 .claude/settings.local.json

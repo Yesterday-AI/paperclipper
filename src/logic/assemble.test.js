@@ -541,6 +541,65 @@ describe('assembleCompany', () => {
     );
   });
 
+  it('throws when a module requires another module that is not selected', async () => {
+    // Add requires to github-repo module
+    const ghMeta = join(templatesDir, 'modules', 'github-repo', 'module.meta.json');
+    await writeJson(ghMeta, {
+      name: 'github-repo',
+      requires: ['auto-assign'],
+      capabilities: [],
+    });
+
+    await assert.rejects(
+      () =>
+        assembleCompany({
+          companyName: 'MissingDep',
+          moduleNames: ['github-repo'],
+          extraRoleNames: [],
+          outputDir,
+          templatesDir,
+        }),
+      {
+        message: 'Module "github-repo" requires module "auto-assign", which is not selected',
+      },
+    );
+  });
+
+  it('succeeds when all required modules are selected', async () => {
+    // Add requires to github-repo module
+    const ghMeta = join(templatesDir, 'modules', 'github-repo', 'module.meta.json');
+    await writeJson(ghMeta, {
+      name: 'github-repo',
+      requires: ['auto-assign'],
+      capabilities: [],
+      tasks: [],
+    });
+
+    const { companyDir } = await assembleCompany({
+      companyName: 'AllDeps',
+      moduleNames: ['github-repo', 'auto-assign'],
+      extraRoleNames: [],
+      outputDir,
+      templatesDir,
+    });
+
+    // Should succeed without error
+    assert.ok(companyDir.endsWith('AllDeps'));
+  });
+
+  it('skips dependency validation for modules with no requires field', async () => {
+    // github-repo in fixtures has no requires field — should work fine
+    const { companyDir } = await assembleCompany({
+      companyName: 'NoDeps',
+      moduleNames: ['github-repo'],
+      extraRoleNames: [],
+      outputDir,
+      templatesDir,
+    });
+
+    assert.ok(companyDir.endsWith('NoDeps'));
+  });
+
   it('resolves capability:* task assignments to the primary owner role', async () => {
     // Add a task with capability: reference
     const aaModuleMeta = join(templatesDir, 'modules', 'auto-assign', 'module.meta.json');

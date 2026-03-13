@@ -2,6 +2,30 @@
 
 All notable changes to Clipper are documented here.
 
+## [0.3.8] — 2026-03-13
+
+### Added
+
+- **Goal templates** — 3 starter goal templates (`launch-mvp`, `setup-cicd`, `build-api`) with pre-defined milestones and issues. New `--goal-template` flag for headless mode. Interactive wizard includes a goal template selection step after modules.
+    - `templates/goals/` directory with `schema.json` for validation.
+    - `loadGoals()` loader with full validation (kebab-case milestone IDs, issue-milestone cross-references, priority values).
+    - Goal template issues provisioned via API with milestone and priority metadata.
+- **`issuePrefix` in provision result** — `provisionCompany()` now returns the Paperclip-generated `issuePrefix` (e.g., `ASD`) alongside `companyId`, enabling deep links to the company dashboard.
+- **Provision test suite** — Unit tests for `provisionCompany()` covering goal template creation, priority mapping, partial failure handling, and error paths.
+
+### Fixed
+
+- **`--goal-template` flag ignored in interactive mode** — The flag was parsed but never passed to the `App` component. Now wired through as `initialGoalTemplate` prop and resolved from loaded templates on mount.
+- **`--goal-template` with invalid name silently skipped** — When the flag didn't match any loaded template, the wizard jumped to summary without applying it. Now falls through to the goal template selection step.
+- **`--preset` shortcut regression** — Passing `--preset` in interactive mode briefly caused extra steps (goal templates + roles) before summary. Now correctly skips to goal template selection (which auto-skips if empty), then straight to summary — while preserving the full role customization step in the manual wizard flow.
+- **BOOTSTRAP.md missing goal template step** — The "Get Started" manual instructions didn't mention creating the starter goal. Now includes a numbered step when a goal template is present.
+- **Headless `goalTemplate` coupling** — Headless provisioning used `assemblyResult.goalTemplate` (a pass-through of the input) instead of the already-resolved `selectedGoalTemplate`. Removed the fragile indirection.
+- **`assembleCompany` return value** — Removed `goalTemplate` from the return object since it was an unchanged echo of the input parameter. Callers already have the value.
+- **`StepGoalTemplates` unstable `useEffect`** — `onComplete` (an inline arrow from the parent) was in the dependency array, causing potential re-trigger loops. Removed from deps since `skip` is stable for the component's lifetime.
+- **Unused `companyDir` prop on `StepProject`** — Dead prop left from earlier refactoring. Removed from `App` render.
+- **`dist/cli.mjs` out of sync** — The committed bundle had stale dependency arrays that didn't match source. Rebuilt.
+- **Goal template breadcrumbs** — `GOAL_TEMPLATES` step now has its own `prev.goalTemplates` context showing company, preset, and modules.
+
 ## [0.3.7] — 2026-03-12
 
 ### Changed
