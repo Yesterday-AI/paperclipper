@@ -200,6 +200,11 @@ export default function App({
       ...(goal.title ? [['Goal', goal.title]] : []),
       ...(presetName ? [['Preset', presetName]] : []),
     ],
+    goalTemplates: [
+      ['Company', companyName],
+      ...(presetName ? [['Preset', presetName]] : []),
+      ...(selectedModules.length ? [['Modules', selectedModules.join(', ')]] : []),
+    ],
     roles: [
       ['Company', companyName],
       ...(presetName ? [['Preset', presetName]] : []),
@@ -285,12 +290,13 @@ export default function App({
 
       {step === STEPS.GOAL_TEMPLATES && (
         <>
-          <PrevSelections entries={prev.modules} />
+          <PrevSelections entries={prev.goalTemplates} />
           <StepGoalTemplates
             goalTemplates={goalTemplates}
             onComplete={(template) => {
               setSelectedGoalTemplate(template);
-              setStep(STEPS.ROLES);
+              // Skip ROLES if preset already pre-filled them
+              setStep(preselectedRoles.length > 0 ? STEPS.SUMMARY : STEPS.ROLES);
             }}
           />
         </>

@@ -40898,6 +40898,11 @@ function App2({
       ...goal.title ? [["Goal", goal.title]] : [],
       ...presetName ? [["Preset", presetName]] : []
     ],
+    goalTemplates: [
+      ["Company", companyName],
+      ...presetName ? [["Preset", presetName]] : [],
+      ...selectedModules.length ? [["Modules", selectedModules.join(", ")]] : []
+    ],
     roles: [
       ["Company", companyName],
       ...presetName ? [["Preset", presetName]] : [],
@@ -40978,14 +40983,14 @@ function App2({
       )
     ] }),
     step === STEPS.GOAL_TEMPLATES && /* @__PURE__ */ (0, import_jsx_runtime15.jsxs)(import_jsx_runtime15.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(PrevSelections, { entries: prev.modules }),
+      /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(PrevSelections, { entries: prev.goalTemplates }),
       /* @__PURE__ */ (0, import_jsx_runtime15.jsx)(
         StepGoalTemplates,
         {
           goalTemplates,
           onComplete: (template) => {
             setSelectedGoalTemplate(template);
-            setStep(STEPS.ROLES);
+            setStep(preselectedRoles.length > 0 ? STEPS.SUMMARY : STEPS.ROLES);
           }
         }
       )
