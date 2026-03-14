@@ -4,7 +4,8 @@
   "constraints": [],
   "roles": [
     "game-designer",
-    "game-artist"
+    "game-artist",
+    "audio-designer"
   ],
   "modules": [
     "game-design",

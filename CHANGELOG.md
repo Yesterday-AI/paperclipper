@@ -6,11 +6,12 @@ All notable changes to Clipper are documented here.
 
 ### Added
 
-- **Game development preset** (`build-game`) — Build a game from idea to playable release. Composes game-design, tech-stack, github-repo, backlog, auto-assign, and stall-detection. Includes Game Designer and Game Artist roles. 5-milestone inline goal (Concept → Prototype → Vertical Slice → Production → Polish & Ship) with 15 issues covering GDD creation, engine setup, art pipeline, playtesting, and distribution.
-- **3 new roles:**
+- **Game development preset** (`build-game`) — Build a game from idea to playable release. Composes game-design, tech-stack, github-repo, backlog, auto-assign, and stall-detection. Includes Game Designer, Game Artist, and Audio Designer roles. 5-milestone inline goal (Concept → Prototype → Vertical Slice → Production → Polish & Ship) with 15 issues covering GDD creation, engine setup, art pipeline, playtesting, and distribution.
+- **4 new roles:**
     - **Game Designer** (`product` division) — Owns the GDD, core mechanics, progression, difficulty curves, and balancing. Gets a role-specific `game-design` skill with deep mechanic design, balancing workflows, and design experiment methodology.
     - **Level Designer** (`product` division) — Owns level layout, pacing, difficulty curves, environmental storytelling, and spatial progression.
     - **Game Artist** (`design` division) — Owns visual art production: sprites, textures, tilesets, UI elements. Creates assets using AI image generation, code-based approaches (SVG, procedural), and asset pipeline tools.
+    - **Audio Designer** (`design` division) — Owns audio production: sound effects, music, ambient soundscapes, and audio systems design. Creates audio using AI generation tools, code-based synthesis, and audio processing pipelines.
 - **`game-design` module** — Game Design Document creation and ongoing mechanic design/balancing. `game-design` capability (owners: game-designer → engineer → ceo). Ships a GDD template (`docs/gdd-template.md`) covering concept, core mechanic, game loop, progression, controls, art/audio direction, and tuning parameters.
 - **Content audit issue** added to `website-relaunch` module — Agent-executed crawl of the current website's content as intake for the redesign, covering content types, key messages, quality, media assets, SEO, and migration strategy.
 

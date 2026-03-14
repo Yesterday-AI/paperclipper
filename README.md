@@ -283,7 +283,7 @@ Start with CEO + Engineer. Everything works. Add specialists and responsibilitie
 | **`build-api`** | build-api, github-repo, backlog, auto-assign, ci-cd, stall-detection | Build a REST/GraphQL API from scratch |
 | **`website-relaunch`** | website-relaunch, github-repo, pr-review, backlog, auto-assign, stall-detection + UI Designer + PO | Relaunch a website with external design assets |
 | **`repo-maintenance`** | triage, codebase-onboarding, dependency-management, release-management, github-repo, pr-review, backlog, auto-assign, stall-detection + Code Reviewer + PO | Maintain an existing repository |
-| **`build-game`** | game-design, tech-stack, github-repo, backlog, auto-assign, stall-detection + Game Designer + Game Artist | Build a game from idea to release |
+| **`build-game`** | game-design, tech-stack, github-repo, backlog, auto-assign, stall-detection + Game Designer + Game Artist + Audio Designer | Build a game from idea to release |
 
 > **`fast`** is for a single engineer — multiple engineers without review will cause conflicts.
 >
@@ -314,7 +314,7 @@ Start with CEO + Engineer. Everything works. Add specialists and responsibilitie
 
 **repo-maintenance** — Custodial maintenance for existing repositories. Agents review and merge open PRs, triage inbound GitHub issues, audit codebase health, manage dependencies, and handle releases. Code Reviewer for PR quality gates, Product Owner for issue triage and backlog. Inline goal bootstraps the team through repo onboarding, process setup, initial sweep, and steady-state maintenance.
 
-**build-game** — Game development from idea to playable release. Game Designer owns the GDD, mechanics, and balancing. Game Artist generates sprites, textures, and tilesets via AI image generation and code-based approaches. Inline goal with 5 milestones: concept (GDD + engine + art style), prototype (core loop + placeholder art + first playtest), vertical slice (one polished level), production (all content), polish & ship (balancing + distribution). Works for any genre.
+**build-game** — Game development from idea to playable release. Game Designer owns the GDD, mechanics, and balancing. Game Artist generates sprites, textures, and tilesets via AI image generation and code-based approaches. Audio Designer creates sound effects, music, and soundscapes via AI generation and code-based synthesis. Inline goal with 5 milestones: concept (GDD + engine + art style), prototype (core loop + placeholder art + first playtest), vertical slice (one polished level), production (all content), polish & ship (balancing + distribution). Works for any genre.
 
 </details>
 
@@ -587,6 +587,7 @@ Every company starts with **CEO** and **Engineer** (base roles). These optional 
 | **Game Designer** | `pm` | CEO | Takes over game-design from Engineer, playtesting focus |
 | **Level Designer** | `pm` | CEO | Takes over level-specific design from Game Designer |
 | **Game Artist** | `designer` | CEO | Takes over art asset creation from Engineer |
+| **Audio Designer** | `designer` | CEO | Takes over audio asset creation from Engineer |
 
 <details>
 <summary><strong>Role details</strong></summary>
@@ -650,6 +651,10 @@ Owns level layout, pacing, difficulty curves, environmental storytelling, and sp
 #### Game Artist
 
 Owns visual art production: sprites, textures, tilesets, UI elements, and visual effects. Creates assets using AI image generation tools, code-based approaches (SVG, procedural generation, pixel art scripts), and asset pipeline tools.
+
+#### Audio Designer
+
+Owns audio production: sound effects, music, ambient soundscapes, and audio systems design. Creates audio using AI generation tools, code-based synthesis (Web Audio API, procedural generation), and audio processing pipelines.
 
 </details>
 

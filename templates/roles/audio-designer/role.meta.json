@@ -1,0 +1,14 @@
+{
+  "name": "audio-designer",
+  "title": "Audio Designer",
+  "division": "design",
+  "tagline": "Crafts the sounds that make the game feel alive",
+  "paperclipRole": "designer",
+  "description": "Owns audio production: sound effects, music, ambient soundscapes, and audio systems design. Creates audio using AI generation tools, code-based synthesis, and audio processing pipelines.",
+  "reportsTo": "ceo",
+  "enhances": [
+    "Takes over audio asset creation from Engineer (placeholder sounds → production audio)",
+    "Takes over audio direction definition from Game Designer",
+    "Adds audio consistency review pass when pr-review module is active"
+  ]
+}
