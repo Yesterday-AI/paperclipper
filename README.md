@@ -554,7 +554,7 @@ Game Design Document creation and ongoing mechanic design, progression, and bala
 
 - **Capability:** `game-design` — owners: `game-designer` &rarr; `engineer` &rarr; `ceo`
 - **Fallback:** CEO writes minimal GDD with concept and core mechanic only
-- **Doc:** `docs/gdd-template.md`
+- **Docs:** `docs/gdd-template.md`, `docs/engine-phaser.md`, `docs/engine-pixijs.md`, `docs/engine-threejs.md`
 
 #### stall-detection
 
