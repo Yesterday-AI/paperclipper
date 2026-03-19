@@ -5,7 +5,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 // @ts-ignore — plain JS modules, bundled by esbuild
-import { assembleCompany } from './logic/assemble.js';
+import { assembleCompany, toPascalCase } from './logic/assemble.js';
 // @ts-ignore
 import { PaperclipClient } from './api/client.js';
 // @ts-ignore
@@ -41,13 +41,23 @@ function downloadTemplatesFromGithub(destDir: string, githubUrl: string): void {
       `Unsupported templates URL: ${githubUrl}. Expected https://github.com/{owner}/{repo}/tree/{branch}/{path}`,
     );
   }
-  const [, owner, repo, _branch, subpath] = match;
+  const [, owner, repo, branch, subpath] = match;
   const cloneUrl = `https://github.com/${owner}/${repo}.git`;
   const tmpDir = path.join(os.tmpdir(), `plugin-templates-dl-${Date.now()}`);
   try {
     execFileSync(
       'git',
-      ['clone', '--depth', '1', '--filter=blob:none', '--sparse', cloneUrl, tmpDir],
+      [
+        'clone',
+        '--depth',
+        '1',
+        '--filter=blob:none',
+        '--sparse',
+        '--branch',
+        branch,
+        cloneUrl,
+        tmpDir,
+      ],
       { stdio: 'pipe' },
     );
     execFileSync('git', ['sparse-checkout', 'set', subpath], { cwd: tmpDir, stdio: 'pipe' });
@@ -253,7 +263,7 @@ const plugin = definePlugin({
         // Collect all .md files from the assembled company dir.
         // For BOOTSTRAP.md, replace the tmp path with the realistic host workspace path
         // so the preview shows where files will actually live after provisioning.
-        const previewCompanyDir = path.join(companiesDir, companyName);
+        const previewCompanyDir = path.join(companiesDir, toPascalCase(companyName));
         const files: Record<string, string> = {};
 
         function collectMdFiles(dir: string, base: string) {

@@ -15,6 +15,14 @@ const PLUGIN_ID = 'paperclipai.plugin-clipper';
 export function WizardPage(_props: PluginPageProps) {
   const { data: templates, loading, error } = usePluginData<TemplateData>('templates');
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] text-sm text-destructive">
+        Failed to load templates: {error.message}
+      </div>
+    );
+  }
+
   if (loading || !templates) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 text-center px-6">
@@ -26,14 +34,6 @@ export function WizardPage(_props: PluginPageProps) {
             downloaded from GitHub — this may take a moment.
           </p>
         </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px] text-sm text-destructive">
-        Failed to load templates: {error.message}
       </div>
     );
   }
