@@ -131,6 +131,10 @@ export class PaperclipClient {
     });
   }
 
+  async deleteCompany(companyId) {
+    return this._fetch(`/api/companies/${companyId}`, { method: 'DELETE' });
+  }
+
   async createAgent(
     companyId,
     { name, role, title, reportsTo, adapterType, adapterConfig, permissions },

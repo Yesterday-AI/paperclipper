@@ -14,7 +14,7 @@
 
 ---
 
-**Company Wizard** is a [Paperclip](https://github.com/paperclipai/paperclip) plugin that sets up a complete AI agent team for your project — roles, workflows, skills, and tasks — in a few clicks. Open it from the sidebar, answer a few questions (or just describe your project), and it provisions everything directly in your Paperclip workspace.
+**Company Wizard** is a [Paperclip](https://github.com/paperclipai/paperclip) plugin that bootstraps an AI agent company for your project — roles, workflows, skills, and tasks — in a few clicks. Open it from the sidebar, answer a few questions (or just describe your project), and it assembles the workspace files and creates the company + CEO in Paperclip. The CEO then hires the team and sets up the backlog on its first heartbeat.
 
 <br>
 
@@ -718,10 +718,11 @@ Create `templates/presets/<name>/preset.meta.json`:
 **Provisioning** (Review → Provision step):
 
 1. Connects to Paperclip API (auto-detects `local_trusted` vs authenticated)
-2. Creates company → goal → project (with workspace) → agents (with adapter config) → module task issues
-3. For each inline goal (from preset/modules): sub-goal → optional project → milestones → issues
-4. Issues with `assignTo: "user"` are assigned to the board user; agent issues to the matching agent
-5. Wires `reportsTo` hierarchy (CEO first, then other agents)
+2. Creates the **company** in Paperclip
+3. Creates the **CEO agent** with adapter config (cwd, instructionsFilePath, model)
+4. Creates a **Bootstrap task** assigned to the CEO
+
+The CEO then sets up the rest of the team on its first heartbeat: hiring the other roles from disk, creating the goal, project, and initial backlog issues. If provisioning fails after the company is created, the partial company is automatically deleted.
 
 <br>
 

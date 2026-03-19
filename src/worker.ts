@@ -438,74 +438,91 @@ const plugin = definePlugin({
       const companyId = company.id;
       log(`✓ Company "${companyName}" created`);
 
-      // Step 6: Create CEO agent (SDK: agents.read only → HTTP client)
-      const userCeoAdapter = (params.ceoAdapter as any) || {};
-      const adapterType =
-        typeof userCeoAdapter.type === 'string' ? userCeoAdapter.type.trim() : 'claude_local';
-      const userCwd = typeof userCeoAdapter.cwd === 'string' ? userCeoAdapter.cwd.trim() : '';
-      const userModel = typeof userCeoAdapter.model === 'string' ? userCeoAdapter.model.trim() : '';
+      // Steps 6-7 are wrapped so we can delete the company on partial failure.
+      let ceoAgentId: string;
+      let bootstrapIssue: { id: string; identifier?: string };
+      try {
+        // Step 6: Create CEO agent (SDK: agents.read only → HTTP client)
+        const userCeoAdapter = (params.ceoAdapter as any) || {};
+        const adapterType =
+          typeof userCeoAdapter.type === 'string' ? userCeoAdapter.type.trim() : 'claude_local';
+        const userCwd = typeof userCeoAdapter.cwd === 'string' ? userCeoAdapter.cwd.trim() : '';
+        const userModel =
+          typeof userCeoAdapter.model === 'string' ? userCeoAdapter.model.trim() : '';
 
-      // CEO starts without an instructionsFilePath — the bootstrap task guides them
-      // to copy their persona files to their permanent workspace and set it themselves.
-      // Use the user-specified cwd if provided; otherwise leave it unset so the agent
-      // runs from whatever directory the adapter defaults to.
-      const adapterConfig: Record<string, unknown> = {
-        // Module-derived adapter overrides (e.g. chrome: true from website-relaunch)
-        ...(assembleResult.roleAdapterOverrides?.get('ceo') ?? {}),
-        cwd: userCwd || companyDir,
-        instructionsFilePath: path.join(companyDir, 'agents', 'ceo', 'AGENTS.md'),
-        ...(userModel ? { model: userModel } : {}),
-      };
+        const adapterConfig: Record<string, unknown> = {
+          ...(assembleResult.roleAdapterOverrides?.get('ceo') ?? {}),
+          cwd: userCwd || companyDir,
+          instructionsFilePath: path.join(companyDir, 'agents', 'ceo', 'AGENTS.md'),
+          ...(userModel ? { model: userModel } : {}),
+        };
 
-      // Adapter-specific permission bypass flags
-      if (adapterType === 'claude_local') {
-        adapterConfig.dangerouslySkipPermissions = true;
-      } else if (adapterType === 'codex_local') {
-        adapterConfig.dangerouslyBypassApprovalsAndSandbox = true;
+        if (adapterType === 'claude_local') {
+          adapterConfig.dangerouslySkipPermissions = true;
+        } else if (adapterType === 'codex_local') {
+          adapterConfig.dangerouslyBypassApprovalsAndSandbox = true;
+        }
+
+        log('Creating CEO agent...');
+        const ceoAgent = await client.createAgent(companyId, {
+          name: 'CEO',
+          role: 'ceo',
+          title: 'CEO',
+          reportsTo: null,
+          adapterType,
+          adapterConfig,
+          permissions: { canCreateAgents: true },
+        });
+        ceoAgentId = ceoAgent.id;
+        log(`✓ CEO agent created (${ceoAgentId})`);
+
+        // Step 7: Create bootstrap issue (SDK: ctx.issues.create ✓)
+        const goalData = (params.goal as any) || {};
+        const bootstrapDescription = generateBootstrapDescription({
+          companyName,
+          generatedFilesPath: companyDir,
+          userCwd,
+          goal: goalData,
+        });
+
+        log('Creating bootstrap task for CEO...');
+        const issue = await ctx.issues.create({
+          companyId,
+          title: `Bootstrap ${companyName}`,
+          description: bootstrapDescription,
+          assigneeAgentId: ceoAgentId,
+        });
+        await ctx.issues.update(issue.id, { status: 'todo' }, companyId);
+        bootstrapIssue = issue as { id: string; identifier?: string };
+        log(`✓ Bootstrap task created: ${bootstrapIssue.identifier || bootstrapIssue.id}`);
+      } catch (err) {
+        // Compensate: delete the company so the user isn't left with a partial stub.
+        log(`✗ Provisioning failed: ${err instanceof Error ? err.message : String(err)}`);
+        log(`Cleaning up — deleting partially created company (${companyId})...`);
+        try {
+          await client.deleteCompany(companyId);
+          log('✓ Company deleted.');
+        } catch (cleanupErr) {
+          log(
+            `⚠ Could not delete company ${companyId}: ${cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr)}`,
+          );
+          log(`  Delete it manually in the Paperclip UI to clean up.`);
+        }
+        throw err;
       }
-
-      log('Creating CEO agent...');
-      const ceoAgent = await client.createAgent(companyId, {
-        name: 'CEO',
-        role: 'ceo',
-        title: 'CEO',
-        reportsTo: null,
-        adapterType,
-        adapterConfig,
-        permissions: { canCreateAgents: true },
-      });
-      const ceoAgentId = ceoAgent.id;
-      log(`✓ CEO agent created (${ceoAgentId})`);
-
-      // Step 7: Create bootstrap issue (SDK: ctx.issues.create ✓)
-      const goalData = (params.goal as any) || {};
-      const bootstrapDescription = generateBootstrapDescription({
-        companyName,
-        generatedFilesPath: companyDir,
-        userCwd,
-        goal: goalData,
-      });
-
-      log('Creating bootstrap task for CEO...');
-      const bootstrapIssue = await ctx.issues.create({
-        companyId,
-        title: `Bootstrap ${companyName}`,
-        description: bootstrapDescription,
-        assigneeAgentId: ceoAgentId,
-      });
-      await ctx.issues.update(bootstrapIssue.id, { status: 'todo' }, companyId);
-      log(`✓ Bootstrap task created: ${(bootstrapIssue as any).identifier || bootstrapIssue.id}`);
 
       log('');
       log('Provisioning complete!');
-      log('The CEO will set up the team on its first heartbeat.');
+      log(
+        'The CEO agent is ready. Trigger its first heartbeat to hire the rest of the team and create the initial backlog.',
+      );
 
       return {
         companyId,
         issuePrefix: company.issuePrefix,
         paperclipUrl,
-        agentIds: { ceo: ceoAgentId },
-        issueIds: [bootstrapIssue.id],
+        agentIds: { ceo: ceoAgentId! },
+        issueIds: [bootstrapIssue!.id],
         logs,
       };
     });
