@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Yesterday-AI/plugin-paperclip-company-wizard/main/public/favicon.svg" alt="Company Wizard" width="48" height="48">
+  <img src="https://raw.githubusercontent.com/Yesterday-AI/paperclip-plugin-company-wizard/main/public/favicon.svg" alt="Company Wizard" width="48" height="48">
   <h1 align="center">Company Wizard</h1>
   <p align="center">
     <strong>Bootstrap AI agent teams from modular templates.</strong>
   </p>
   <p align="center">
-    <a href="https://www.npmjs.com/package/@yesterday-ai/plugin-paperclip-company-wizard"><img src="https://img.shields.io/npm/v/@yesterday-ai/plugin-paperclip-company-wizard?color=cb3837&label=npm" alt="npm version"></a>
-    <a href="https://github.com/Yesterday-AI/plugin-paperclip-company-wizard/actions/workflows/ci.yml"><img src="https://github.com/Yesterday-AI/plugin-paperclip-company-wizard/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <a href="https://www.npmjs.com/package/@yesterday-ai/paperclip-plugin-company-wizard"><img src="https://img.shields.io/npm/v/@yesterday-ai/paperclip-plugin-company-wizard?color=cb3837&label=npm" alt="npm version"></a>
+    <a href="https://github.com/Yesterday-AI/paperclip-plugin-company-wizard/actions/workflows/ci.yml"><img src="https://github.com/Yesterday-AI/paperclip-plugin-company-wizard/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
     <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node.js"></a>
   </p>
@@ -21,7 +21,7 @@
 **npm package installation (Paperclip > Settings > Plugins > Install Plugin):**
 
 ```bash
-@yesterday-ai/plugin-paperclip-company-wizard
+@yesterday-ai/paperclip-plugin-company-wizard
 ```
 
 <br>
@@ -514,7 +514,7 @@ Configure the plugin via **Settings → Plugins → Company Wizard** in the Pape
 | --- | --- | --- |
 | `companiesDir` | No | Where assembled company workspaces are written. Defaults to `~/.paperclip/instances/default/companies`. Override for Docker setups. |
 | `templatesPath` | No | Path to the templates directory. Defaults to `~/.paperclip/plugin-templates` (auto-downloaded from `templatesRepoUrl` if missing). |
-| `templatesRepoUrl` | No | GitHub tree URL to pull templates from when the templates directory does not exist. Defaults to the official @Yesterday-AI/plugin-paperclip-company-wizard templates. |
+| `templatesRepoUrl` | No | GitHub tree URL to pull templates from when the templates directory does not exist. Defaults to the official @Yesterday-AI/paperclip-plugin-company-wizard templates. |
 | `paperclipUrl` | No | Paperclip instance URL. Defaults to `http://localhost:3100` or `PAPERCLIP_PUBLIC_URL` env var. |
 | `paperclipEmail` | No | Board login email. Required for authenticated (non-`local_trusted`) instances. |
 | `paperclipPassword` | No | Board login password. Stored as a secret ref. |

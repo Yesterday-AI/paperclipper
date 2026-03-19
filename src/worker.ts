@@ -1,22 +1,22 @@
 import { definePlugin, runWorker } from '@paperclipai/plugin-sdk';
-import fs from 'node:fs';
-import path from 'node:path';
-import os from 'node:os';
-import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 // @ts-ignore — plain JS modules, bundled by esbuild
 import { assembleCompany, toPascalCase } from './logic/assemble.js';
 // @ts-ignore
 import { PaperclipClient } from './api/client.js';
 // @ts-ignore
-import { loadPresets, loadModules, collectGoals } from './logic/load-templates.js';
+import { collectGoals, loadModules, loadPresets } from './logic/load-templates.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // --- Template loader ---
 
 const DEFAULT_TEMPLATES_REPO_URL =
-  'https://github.com/Yesterday-AI/plugin-paperclip-company-wizard/tree/main/templates';
+  'https://github.com/Yesterday-AI/paperclip-plugin-company-wizard/tree/main/templates';
 const BUNDLED_TEMPLATES_DIR = path.resolve(__dirname, '..', 'templates');
 
 /** Recursively copy a directory (sync). */

@@ -1,7 +1,7 @@
 import type { PaperclipPluginManifestV1 } from '@paperclipai/plugin-sdk';
 
 const manifest: PaperclipPluginManifestV1 = {
-  id: 'yesterday-ai.plugin-paperclip-company-wizard',
+  id: 'yesterday-ai.paperclip-plugin-company-wizard',
   apiVersion: 1,
   version: '0.1.2',
   displayName: 'Company Wizard',
@@ -39,7 +39,7 @@ const manifest: PaperclipPluginManifestV1 = {
       templatesRepoUrl: {
         type: 'string',
         default:
-          'https://github.com/Yesterday-AI/plugin-paperclip-company-wizard/tree/main/templates',
+          'https://github.com/Yesterday-AI/paperclip-plugin-company-wizard/tree/main/templates',
         description:
           'GitHub tree URL to pull templates from when the templates directory does not exist.',
       },

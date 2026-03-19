@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-Company Wizard is a [Paperclip](https://github.com/paperclipai/paperclip) plugin for bootstrapping agent company workspaces. It provides an interactive wizard UI (manual and AI-powered paths) that assembles companies from modular templates and optionally provisions them via the Paperclip API. Derived from the standalone `@yesterday-ai/plugin-paperclip-company-wizard` CLI.
+Company Wizard is a [Paperclip](https://github.com/paperclipai/paperclip) plugin for bootstrapping agent company workspaces. It provides an interactive wizard UI (manual and AI-powered paths) that assembles companies from modular templates and optionally provisions them via the Paperclip API. Derived from the standalone `@yesterday-ai/paperclip-plugin-company-wizard` CLI.
 
 ## Commands
 
@@ -120,4 +120,4 @@ Two separate test runners:
 
 ## Legacy Note
 
-This plugin was derived from [`@yesterday-ai/plugin-paperclip-company-wizard`](https://github.com/Yesterday-AI/plugin-paperclip-company-wizard), the standalone Ink-based CLI. The template system, assembly logic, and API client were carried over intact. The CLI entry points (`src/cli.jsx`, `src/app.jsx`, `src/headless.js`), Ink components, and old build config were removed. See `CHANGELOG.md` for the full v0.1.0 feature list.
+This plugin was derived from [`@yesterday-ai/paperclip-plugin-company-wizard`](https://github.com/Yesterday-AI/paperclip-plugin-company-wizard), the standalone Ink-based CLI. The template system, assembly logic, and API client were carried over intact. The CLI entry points (`src/cli.jsx`, `src/app.jsx`, `src/headless.js`), Ink components, and old build config were removed. See `CHANGELOG.md` for the full v0.1.0 feature list.
