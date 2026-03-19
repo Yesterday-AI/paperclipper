@@ -6,7 +6,7 @@
   </p>
   <p align="center">
     <a href="https://www.npmjs.com/package/@yesterday-ai/plugin-paperclip-company-wizard"><img src="https://img.shields.io/npm/v/@yesterday-ai/plugin-paperclip-company-wizard?color=cb3837&label=npm" alt="npm version"></a>
-    <a href="https://github.com/Yesterday-AI/plugin-paperclip-company-wizard/actions/workflows/ci.yml"><img src="https://github.com/Yesterday-AI/plugin-paperclip-company-wizard/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <a href="https://github.com/Yesterday-AI/paperclipper/actions/workflows/ci.yml"><img src="https://github.com/Yesterday-AI/paperclipper/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
     <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node.js"></a>
   </p>
