@@ -121,6 +121,7 @@ Start with just a CEO. Everything works. Add roles and responsibilities shift au
 | **`website-relaunch`** | website-relaunch, github-repo, pr-review, backlog, auto-assign, stall-detection + UI Designer + PO | Relaunch a website with external design assets |
 | **`repo-maintenance`** | triage, codebase-onboarding, dependency-management, release-management, github-repo, pr-review, backlog, auto-assign, stall-detection + Code Reviewer + PO | Maintain an existing repository |
 | **`build-game`** | game-design, tech-stack, github-repo, backlog, auto-assign, stall-detection + Game Designer + Game Artist + Audio Designer | Build a game from idea to release |
+| **`launch-pack`** | vision-workshop, market-analysis, competitive-intel, brand-identity, tech-stack, architecture-plan, launch-mvp, github-repo, backlog, auto-assign, stall-detection + CTO + CMO | Full executive team launch: strategy, tech, and marketing from day one |
 
 > **`fast`** is for a single engineer — multiple engineers without review will cause conflicts.
 >
