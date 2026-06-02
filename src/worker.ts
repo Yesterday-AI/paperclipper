@@ -574,7 +574,7 @@ const plugin = definePlugin({
             logPendingApproval(ceoAgent);
           }
 
-          // Step 7: Create bootstrap issue (SDK: ctx.issues.create ✓)
+          // Step 7: Create bootstrap issue (PaperclipClient — avoids invocation scope issues)
           // BOOTSTRAP.md IS the bootstrap issue — read it directly.
           const bootstrapDescription = fs.readFileSync(
             path.join(companyDir, 'BOOTSTRAP.md'),
@@ -582,13 +582,12 @@ const plugin = definePlugin({
           );
 
           log('Creating bootstrap task for CEO...');
-          const issue = await ctx.issues.create({
-            companyId,
+          const issue = await client.createIssue(companyId, {
             title: `Bootstrap ${company.name || companyName}`,
             description: bootstrapDescription,
             assigneeAgentId: ceoAgentId,
           });
-          await ctx.issues.update(issue.id, { status: 'todo' }, companyId);
+          // Issues are created with status 'todo' by default — no explicit update needed.
           bootstrapIssue = issue as { id: string; identifier?: string };
           log(`✓ Bootstrap task created: ${bootstrapIssue.identifier || bootstrapIssue.id}`);
         } catch (err) {
