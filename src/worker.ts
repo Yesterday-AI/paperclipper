@@ -587,6 +587,7 @@ const plugin = definePlugin({
             description: bootstrapDescription,
             assigneeAgentId: ceoAgentId,
           });
+          // Issues are created with status 'todo' by default — no explicit update needed.
           bootstrapIssue = issue as { id: string; identifier?: string };
           log(`✓ Bootstrap task created: ${bootstrapIssue.identifier || bootstrapIssue.id}`);
         } catch (err) {
